@@ -1,0 +1,35 @@
+{
+  "name": "mindback",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "app.js",
+  "scripts": {
+    "dev": "nodemon src/app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jvinizds/mindback.git"
+  },
+  "keywords": [
+    "mongodb",
+    "NodeJS"
+  ],
+  "author": "João Vinicius Santos/Vitor Dutra",
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.1",
+    "express": "^4.18.1",
+    "express-validator": "^6.14.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongodb": "^4.6.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.16"
+  },
+  "engines": {
+    "node": "16.x",
+    "npm": "8.x"
+  }
+}

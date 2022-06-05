@@ -1,0 +1,63 @@
+//Teste de Requisições REST - Usuários
+//@baseURL = https://mindback.herokuapp.com/api
+@baseURL = http://localhost:4000/api
+@id = 629ab025db2d5f264a88a9d0
+###
+// GET - Lista todos os usuários
+GET {{baseURL}}/usuarios
+Content-Type: application/json
+
+###
+// GET - Lista apenas um usuário pelo id
+GET {{baseURL}}/usuarios/id/{{id}}
+Content-Type: application/json
+
+###
+// POST - Inclui um novo usuário
+POST {{baseURL}}/usuarios
+Content-Type: application/json
+
+{
+   "nome": "João Vinicius Zacaria dos Santos",
+   "email": "joaoviniciuszds@gmail.com",
+   "senha": "Jv1234!"
+}
+
+### 
+// DELETE - Apaga um usuário através do id informado
+DELETE {{baseURL}}/usuarios/{{id}}
+Content-Type: application/json
+
+###
+// PUT - Altera um usuário pelo ID
+PUT {{baseURL}}/usuarios/{{id}}
+Content-Type: application/json
+
+{
+    "nome": "João Vinicius Zacaria dos Santos",
+    "email": "joaoviniciuszds@outlook.com",
+    "senha": "Jv1234!",
+    "ativo": true,
+    "tipo": "Cliente",
+    "avatar": "https://ui-avatars.com/api/?background=3700B3&color=FFFFFF&name=João+Vinicius+Zacaria+dos+Santos"
+
+  }
+
+###
+// POST - Efetuar o Login
+POST {{baseURL}}/usuarios/login
+Content-Type: application/json
+
+{
+   "email": "joaoviniciuszds@outlook.com",
+   "senha": "Jv1234!"
+
+}
+
+###
+// GET - Validar o token
+GET {{baseURL}}/usuarios/token
+Content-Type: application/json
+access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvIjp7ImlkIjoiNjE4YWZhNDU0YjE4YmFkYTY2NmE4NDE0In0sImlhdCI6MTYzNzY5MTk5OCwiZXhwIjoxNjM3NzI3OTk4fQ.mw-plPkz8fagYGn6mXZBthp4bstdPPTnGYHPCnkQrxo
+
+
