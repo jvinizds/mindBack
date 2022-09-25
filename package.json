@@ -2,9 +2,10 @@
   "name": "mindback",
   "version": "1.0.0",
   "description": "Back-end para a aplicação Mind",
-  "main": "index.js",
+  "type": "module",
+  "main": "src/app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon src/app.js"
   },
   "repository": {
     "type": "git",
@@ -17,11 +18,20 @@
   },
   "homepage": "https://github.com/jvinizds/mindBack#readme",
   "dependencies": {
+    "aws-sdk": "^2.1223.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
+    "express-validator": "^6.14.2",
     "jsonwebtoken": "^8.5.1",
-    "mongodb": "^4.9.0"
+    "mongodb": "^4.9.0",
+    "multer": "^1.4.5-lts.1",
+    "multer-s3": "^3.0.1",
+    "nodemon": "^2.0.20"
+  },
+  "engines": {
+    "node": "16.x",
+    "npm": "8.x"
   }
 }
