@@ -1,0 +1,269 @@
+//Selecione o database
+use("mind")
+
+// Remove collection
+db.perfil.drop()
+
+// Cria collection com a validação do schema
+
+db.createCollection("perfil", {
+    validator: {
+        $jsonSchema: {
+            bsonType: "object",
+            required: ["cpf", "nome", "sobrenome", "telefone", "plano", "login", "foto_perfil"],
+            properties: {
+                cpf: {
+                    bsonType: "string",
+                    pattern: "/^[0-9]{11}$/",
+                    description: "Cpf deve conter apenas 11 números e é obrigatório"
+                },
+                nome: {
+                    bsonType: "string",
+                    minLength: 2,
+                    maxLength: 30,
+                    description: "Nome deve ser um texto entre 2 a 30 caracteres e é obrigatório"
+                },
+                sobrenome: {
+                    bsonType: "string",
+                    minLength: 2,
+                    maxLength: 30,
+                    description: "Nome deve ser um texto entre 2 a 30 caracteres e é obrigatório"
+                },
+                tipo_perfil: {
+                    enum: ["Usuario", "Admin"],
+                    description: "Tipo do perfil deve ser Usuario ou Admin"
+                },
+                genero: {
+                    enum: ["Masculino", "Feminino", "Outro"],
+                    description: "Genero deve ser Masculino, Feminino ou Outro"
+                },
+                data_nascimento: {
+                    bsonType: "date",
+                    description: "Data de nascimento"
+                },
+                telefone: {
+                    bsonType: "object",
+                    required: ["ddd", "numero"],
+                    properties: {
+                        telefone_ddd: {
+                            bsonType: "string",
+                            pattern: "/^[0-9]{2}$/",
+                            description: "DDD deve conter 2 números e é obrigatorio"
+                        },
+                        telefone_numero: {
+                            bsonType: "string",
+                            minLength: 8,
+                            maxLength: 9,
+                            pattern: "/([0-9]{9}$)/",
+                            description: "Número do celular deve conter 9 números e é obrigatorio"
+                        }
+                    }
+                },
+                login: {
+                    bsonType: "object",
+                    required: ["login_email", "login_senha"],
+                    properties: {
+                        login_email: {
+                            bsonType: "string",
+                            pattern: '/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/',
+                            description: "Email deve ser válido e é obrigatorio"
+                        },
+                        login_senha: {
+                            bsonType:"string",
+                            description: "Senha é obrigatorio" 
+                        }
+                    }
+                },
+                amigos: {
+                    bsonType: "array",
+                    uniqueItems: true,
+                    maxItems: 10,
+                    additionalProperties: false,
+                    items:{
+                        bsonType: "object",
+                        required: ["amigo_id", "amigo_nome"],
+                        properties: {
+                            amigo_id: {
+                                bsonType: "string",
+                                pattern: "/^[0-9a-fA-F]{24}$/",
+                                description: "Id do amigo é obrigatorio"
+                            },
+                            amigo_nome: {
+                                bsonType: "string",
+                                minLength: 2,
+                                maxLength: 30,
+                                description: "Nome do amigo deve ser um texto entre 2 a 30 caracteres e é obrigatório"
+                            },
+                            amigo_sobrenome: {
+                                bsonType: "string",
+                                minLength: 2,
+                                maxLength: 30,
+                                description: "Nome do amigo deve ser um texto entre 2 a 30 caracteres e é obrigatório"
+                            }
+                        }
+                    }
+                },
+               conquistas: {
+                    bsonType: "array",
+                    uniqueItems: true,
+                    maxItems: 10,
+                    additionalProperties: false,
+                    items:{
+                        bsonType: "object",
+                        required: ["conquista_id", "conquista_titulo"],
+                        properties: {
+                            conquista_id: {
+                                bsonType: "string",
+                                pattern: "/^[0-9a-fA-F]{24}$/",
+                                description: "Id da conquista é obrigatorio"
+                            },
+                            conquista_titulo: {
+                                bsonType: "string",
+                                minLength: 2,
+                                maxLength: 40,
+                                description: "Titulo da conquista deve ser um texto entre 2 a 40 caracteres e é obrigatório"
+                            }
+                        }
+                    }
+                },
+                plano: {
+                    bsonType: "object",
+                    required: ["plano_id", "plano_descricao", "plano_tipo" "plano_valor"],
+                    properties: {
+                        plano_id: {
+                            pattern: "/^[0-9a-fA-F]{24}$/",
+                            description: "Id do plano é obrigatorio"
+                        },
+                        plano_descricao: {
+                            bsonType: "string",
+                            minLength: 2,
+                            maxLength: 30,
+                            description: "Descrição do plano deve ser um texto entre 2 a 30 caracteres e é obrigatório"
+                        },
+                        plano_tipo: {
+                            enum: ["Gratuito", "Pago"],
+                            description: "O tipo do conteudo deve ser 0 (Gratuito) ou 1 (Pago)"
+                        },
+                        plano_valor: {
+                            bsonType: "double",
+                            minimum: 0,
+                            description: "O preço não pode ser negativo"
+                        },
+                    }
+                },
+                conteudo_recente: {
+                    bsonType: "array",
+                    uniqueItems: true,
+                    maxItems: 10,
+                    additionalProperties: false,
+                    items:{
+                        bsonType: "object",
+                        required: ["conteudo_recente_id", "conteudo_recente_tipo", "conteudo_recente_titulo"],
+                        properties: {
+                            conteudo_recente_id: {
+                                bsonType: "string",
+                                pattern: "/^[0-9a-fA-F]{24}$/",
+                                description: "Id do conteudo é obrigatorio"
+                            },
+                            conteudo_recente_tipo: {
+                                enum: ["Artigo", "Audio", "Video"],
+                                description: 'O tipo do conteudo deve ser Artigo, Audio ou Video'
+                            },
+                            conteudo_recente_categoria: {
+                                enum: ["Ansiedade", "Ioga", "Meditação"],
+                                description: 'A categoria do conteudo deve ser Ansiedade, Ioga ou Meditação'
+                            },
+                            conteudo_recente_titulo: {
+                                bsonType: "string",
+                                minLength: 2,
+                                maxLength: 40,
+                                description: "Titulo do conteudo deve ser um texto entre 2 a 40 caracteres e é obrigatório"
+                            }
+                        }
+                    }
+                },
+                forma_pagamento: {
+                    bsonType: "object",
+                    required: ["cartao_num", "cartao_data_venc", "cartao_cvv"],
+                    properties: {
+                        cartao_num: {
+                            bsonType: "string",
+                            pattern: "/^[0-9]{14,16}$/",
+                            description: "Numero do cartão deve conter entre 14 a 16 numeros e é obrigatorio"
+                        },
+                        cartao_mes_venc: {
+                            bsonType: "string",
+                            minimum: 01,
+                            maximum: 12,
+                            description: "Mês de vencimento do cartão deve ser entre 01 e 12 e é obrigatorio"
+                        },
+                        cartao_ano_venc: {
+                            bsonType: "string",
+                            description: "Ano de vencimento do cartão deve conter 4 números, sendo igual ou maior do que o ano atual e é obrigatorio"
+                        },
+                        cartao_cvv: {
+                            bsonType: "string",
+                            pattern: "/^[0-9]{3}$/",
+                            description: "Cvv do cartão deve conter 3 números e é obrigatorio"
+                        }
+                    }
+                },
+                foto_perfil: {
+                    bsonType: "object",
+                    required: ["foto_perfil_nome", "foto_perfil_tamanho", "foto_perfil_key", "foto_perfil_url"],
+                    properties: {
+                        foto_perfil_nome: {
+                            bsonType: "string",
+                            description: "Nome original da imagem"
+                        },
+                        foto_perfil_key: {
+                            bsonType: "string",
+                            description: "Key da imagem"
+                        },
+                        foto_perfil_tamanho: {
+                            bsonType: "number",
+                            description: "Tamanho da imagem"
+                        },
+                         foto_perfil_url: {
+                            bsonType: "string",
+                            description: "Nome original da imagem"
+                        }                       
+                    }
+                }
+            }    
+        }
+    },
+    validationLevel: "strict", //strict aplica no insert e no update, moderate insert ou off
+    validationAction: "error" //error rejeita o documento ou warn inclui e registra no log
+})
+
+//Criando um índice único no campo cpf
+db.perfil.createIndex({ "cpf": 1 }, { unique: true })
+
+//Insere um novo registro
+db.perfil.insertOne({
+    "cpf": "47231369758",
+    "nome": "João Vinicius",
+    "sobrenome": "Santos",
+    "tipo_perfil": "Usuario",
+    "telefone": {
+        "telefone_ddd": "11",
+        "telefone_numero": "9755003307"
+    },
+    "plano": {
+        "plano_id": "632c48432f6f81b1ea0396a3",
+        "plano_descricao": "Plano premium",
+        "plano_tipo": "Pago",
+        "plano_valor": 20.5
+    },
+    "login": {
+            "login_email": "joaoviniciuszds@gmail.com",
+            "login_senha": "teste"
+        },
+    "foto_perfil": {
+        "foto_perfil_nome": "",
+        "foto_perfil_key": "",
+        "foto_perfil_tamanho": "",
+        "foto_perfil_url": ""
+    }
+})
