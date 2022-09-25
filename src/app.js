@@ -1,6 +1,6 @@
-import express from 'express'
+import express from 'express';
 import cors from 'cors'
-import rotasUsuarios from './routes/usuarios.js'
+import rotasPerfil from './routes/perfil.js'
 
 const app = express();
 const port = process.env.PORT || 4000
@@ -23,7 +23,7 @@ app.get('/api', (req, res) => {
 })
 
 // Rotas 
-app.use('/api/usuarios', rotasUsuarios)
+app.use('/api/perfil', rotasPerfil)
 
 // Rota invalida
 app.use(function (req, res) {
