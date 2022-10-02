@@ -5,7 +5,7 @@ import rotasPerfil from './routes/perfil.js'
 import swaggerUI from 'swagger-ui-express'
 
 const app = express();
-const port = process.env.PORT || 4000
+const PORT = process.env.PORT || 4000
 
 app.use(cors())
 app.use(express.urlencoded({ extended: true }));
@@ -42,6 +42,6 @@ app.use(function (req, res) {
     )
 })
 
-app.listen(port, function () {
-    console.log(`Servidor rodando na porta ${port}`)
+app.listen(PORT, function () {
+    console.log(`Servidor rodando na porta ${PORT}`)
 })
