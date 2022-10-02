@@ -1,0 +1,229 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "API Mind",
+    "description": "Documentação gerada usando o módulo <a href='https://github.com/davibaltar/swagger-autogen' target='_blank'>swagger-autogen</a>."
+  },
+  "host": "",
+  "basePath": "/",
+  "schemes": [
+    "https"
+  ],
+  "securityDefinitions": {
+    "apiKeyAuth": {
+      "type": "apiKey",
+      "in": "header",
+      "name": "access-token",
+      "description": "Token de acesso gerado após o login"
+    }
+  },
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api": {
+      "get": {
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/perfil/id/{id}": {
+      "get": {
+        "tags": [
+          "Perfil"
+        ],
+        "description": "Endpoint que retorna os dados de um perfil filtrando pelo id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Solicitação Inválida"
+          },
+          "500": {
+            "description": "Erro Interno do Servidor"
+          }
+        }
+      }
+    },
+    "/api/perfil/": {
+      "post": {
+        "tags": [
+          "Perfil"
+        ],
+        "description": "Endpoint para cadastrar um novo perfil",
+        "parameters": [
+          {
+            "name": "DadosPerfil",
+            "in": "body",
+            "description": "Informações do perfil.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/DadosPerfil"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "201": {
+            "description": "Perfil registrado com sucesso!"
+          },
+          "202": {
+            "description": "Aceito"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "403": {
+            "description": "Erro ao tentar incluir o novo perfil",
+            "schema": {
+              "$ref": "#/definitions/Erro"
+            }
+          },
+          "500": {
+            "description": "Erro Interno do Servidor"
+          }
+        }
+      }
+    },
+    "/api/perfil/imagem": {
+      "put": {
+        "tags": [
+          "Imagem"
+        ],
+        "description": "Endpoint que permite alterar a imagem do usuario pelo id",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "_id": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Aceito"
+          },
+          "400": {
+            "description": "Solicitação Inválida"
+          },
+          "403": {
+            "description": "Acesso Negado"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Erro": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string",
+          "example": "Erro gerado pela aplicação"
+        },
+        "msg": {
+          "type": "string",
+          "example": "Mensagem detalhando o erro"
+        },
+        "param": {
+          "type": "string",
+          "example": "URL que gerou o erro"
+        }
+      }
+    },
+    "DadosPerfil": {
+      "type": "object",
+      "properties": {
+        "cpf": {
+          "type": "string",
+          "example": "47231369752"
+        },
+        "nome": {
+          "type": "string",
+          "example": "João Vinicius"
+        },
+        "sobrenome": {
+          "type": "string",
+          "example": "Santos"
+        },
+        "tipo_perfil": {
+          "type": "string",
+          "example": "Usuario"
+        },
+        "telefone": {
+          "type": "object",
+          "properties": {
+            "telefone_ddd": {
+              "type": "string",
+              "example": "11"
+            },
+            "telefone_numero": {
+              "type": "string",
+              "example": "975003307"
+            }
+          }
+        },
+        "plano": {
+          "type": "object",
+          "properties": {
+            "plano_id": {
+              "type": "string",
+              "example": "6331bdd97a625c4641e95715"
+            },
+            "plano_descricao": {
+              "type": "string",
+              "example": "Plano premium"
+            },
+            "plano_tipo": {
+              "type": "string",
+              "example": "Pago"
+            },
+            "plano_valor": {
+              "type": "number",
+              "example": 19
+            }
+          }
+        },
+        "login": {
+          "type": "object",
+          "properties": {
+            "login_email": {
+              "type": "string",
+              "example": "joaoviniciuszds@gmail.com"
+            },
+            "login_senha": {
+              "type": "string",
+              "example": "Jv159357!"
+            }
+          }
+        }
+      }
+    }
+  }
+}
