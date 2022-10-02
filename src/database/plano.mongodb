@@ -1,0 +1,36 @@
+//Selecione o database
+use("mind")
+db.plano.drop()
+db.createCollection("plano", {
+    validator: {
+        $jsonSchema: {
+            bsonType: "object",
+            required: ["descricao", "tipo", "valor"],
+            properties: {
+                descricao: {
+                    bsonType: "string",
+                    minLength: 2,
+                    maxLength: 30,
+                    description: "Descrição do plano deve ser um texto entre 2 a 30 caracteres e é obrigatório"
+                },
+                tipo: {
+                    enum: ["Gratuito", "Pago"],
+                    description: "O tipo do conteudo deve ser 0 (Gratuito) ou 1 (Pago)"
+                },
+                valor: {
+                    bsonType: "number",
+                    minimum: 0,
+                    maximum: 100,
+                    description: "O preço não pode ser negativo"
+                }                
+            }  
+        }
+    },
+    validationLevel: "strict", //strict aplica no insert e no update, moderate no insert ou off
+    validationAction: "error" //error rejeita o documento ou warn inclui e registra no log
+})
+db.plano.insertOne({
+    "descricao": "Plano premium",
+    "tipo": "Pago",
+    "valor": 19.9
+})

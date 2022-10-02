@@ -54,4 +54,28 @@ export async function connectToDatabase() {
     return cached.conn
 }
 
+export function error_handler(error_code) {
+    const error_codes = [
+        { "code": 112, "descricao": "Conflito de escrita" },
+        { "code": 121, "descricao": "A validação do documento enviado falhou" },
+        { "code": 211, "descricao": "Chave não encontrada" },
+        { "code": 11000, "descricao": "Chave Duplicada" },
+        { "code": 11600, "descricao": "MongoDB está indisponivel" }
+    ]
+    let erro_descricao
+    
+    error_codes.map(code => {
+        if (code.code == error_code) {
+            erro_descricao = code.descricao
+        }
+    })
+
+    if (!erro_descricao) {
+        return "Erro interno"
+    } else {
+        return erro_descricao
+    }
+
+}
+
 export { MONGODB_DB, MONGODB_URI }
