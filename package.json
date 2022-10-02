@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "description": "Back-end para a aplicação Mind",
   "type": "module",
-  "main": "src/app.js",
+  "main": "src/index.js",
   "scripts": {
-    "start": "node app.js",
-    "dev": "nodemon src/app.js",
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
     "doc": "node swagger.js"
   },
   "repository": {

@@ -60,6 +60,6 @@ const options = {
 }
 
 swaggerAutogen(options)(outputFile, endpointsFiles, doc).then(async () => {
-    await import('./src/app.js');
+    await import('./src/index.js');
 
 })
