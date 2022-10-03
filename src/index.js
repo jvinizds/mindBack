@@ -1,12 +1,13 @@
 import express from 'express'
+import * as dotenv from 'dotenv'
 import fs from 'fs'
 import cors from 'cors'
 import rotasPerfil from './routes/perfil.js'
 import swaggerUI from 'swagger-ui-express'
-
 const app = express();
 const PORT = process.env.PORT || 4000
 
+dotenv.config()
 app.use(cors())
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json())
