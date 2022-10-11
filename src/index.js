@@ -17,7 +17,7 @@ app.disable('x-powered-by')
 app.use('/', express.static('public'))
 
 // Rota default
-app.get('/api', (req, res) => {
+app.get('/', (req, res) => {
     res.status(200).json({
         message: 'Api funcionando',
         version: '1.0.1'
@@ -25,9 +25,9 @@ app.get('/api', (req, res) => {
 })
 
 // Rotas 
-app.use('/api/perfil', rotasPerfil)
+app.use('/perfil', rotasPerfil)
 
-app.use('/api/doc', swaggerUI.serve, swaggerUI.setup(JSON.parse(fs.readFileSync('./src/swagger/swagger_output.json'))))
+app.use('/doc', swaggerUI.serve, swaggerUI.setup(JSON.parse(fs.readFileSync('./src/swagger/swagger_output.json'))))
 
 // Rota invalida
 app.use(function (req, res) {

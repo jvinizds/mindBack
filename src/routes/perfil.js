@@ -117,7 +117,7 @@ const validaPerfilLogin = [
         }).withMessage('A senha deve conter ao menos 1 letra minúscula, 1 letra maiúscula, 1 símbolo e 1 número')
 ]
 
-//GET api/perfil/id/:id
+//GET perfil/id/:id
 router.get("/id/:id", async (req, res) => {
     /*
         #swagger.tags = ['Perfil']
@@ -159,7 +159,7 @@ router.get("/id/:id", async (req, res) => {
     }
 })
 
-// POST api/perfil/
+// POST perfil/
 router.post('/', validaPerfilCadastroAlterar, validaPerfilCadastroInicial, async (req, res) => {
     /*  
         #swagger.tags = ['Perfil']
@@ -198,7 +198,7 @@ router.post('/', validaPerfilCadastroAlterar, validaPerfilCadastroInicial, async
     }
 })
 
-// PUT api/perfil/:id
+// PUT perfil/:id
 router.put('/:id', validaPerfilCadastroAlterar, async (req, res) => {
     /*  
         #swagger.tags = ['Perfil']
@@ -236,7 +236,7 @@ router.put('/:id', validaPerfilCadastroAlterar, async (req, res) => {
     }
 })
 
-// PUT api/perfil/imagem
+// PUT perfil/imagem
 router.put('/imagem', async (req, res) => {
     /* 
         #swagger.tags = ['Imagem']
@@ -304,7 +304,7 @@ router.put('/imagem', async (req, res) => {
     })
 })
 
-// DELETE api/perfil/:id
+// DELETE perfil/:id
 router.delete('/:id', async (req, res) => {
     /* 
         #swagger.tags = ['Perfil']
@@ -318,7 +318,7 @@ router.delete('/:id', async (req, res) => {
         .catch(err => res.status(400).json({ error: error_handler(err.code) }))
 })
 
-// POST api/perfil/login
+// POST perfil/login
 router.post('/login', validaPerfilLogin, async (req, res) => {
     /* 
         #swagger.tags = ['Perfil']
@@ -374,7 +374,7 @@ router.post('/login', validaPerfilLogin, async (req, res) => {
 })
 
 
-//GET api/perfil/token
+//GET perfil/token
 router.get('/token', auth, async (req, res) => {
     /* 
         #swagger.tags = ['Usuários']
