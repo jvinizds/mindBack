@@ -1,0 +1,60 @@
+//Selecione o database
+use("mind")
+
+// Remove collection conteudo
+db.conteudo.drop()
+
+// Cria collection conteudo com a validação do schema
+db.createCollection("conteudo", {
+    validator: {
+        $jsonSchema: {
+            bsonType: "object",
+            required: ["tipo", "categoria", "titulo", "descricao", "url"],
+            properties: {
+                _id: { 
+                    bsonType: "objectId" 
+                    },
+                tipo: {
+                    enum: ["Artigo", "Audio", "Video"],
+                    description: 'O tipo do conteudo deve ser Artigo, Audio ou Video'
+                },
+                categoria: {
+                    enum: ["Ansiedade", "Ioga", "Meditação"],
+                    description: 'A categoria do conteudo deve ser Ansiedade, Ioga ou Meditação'
+                },
+                titulo: {
+                    bsonType: "string",
+                    minLength: 2,
+                    maxLength: 40,
+                    description: "Titulo do conteudo deve ser um texto entre 2 a 40 caracteres e é obrigatório"
+                },
+                descricao: {
+                    bsonType: "string",
+                    minLength: 2,
+                    maxLength: 100,
+                    description: "Descrição do conteudo deve ser um texto entre 2 a 100 caracteres e é obrigatório"
+                }, 
+                url: {
+                    bsonType: "string",
+                    description: "URL do conteudo"
+                }         
+            },
+            additionalProperties: false
+        }
+    },
+    validationLevel: "moderate", //strict aplica no insert e no update, moderate no insert ou off
+    validationAction: "error" //error rejeita o documento ou warn inclui e registra no log
+})
+
+//Criando um índice único no campo cpf
+db.conteudo.createIndex({ "titulo": 1 }, { unique: true })
+db.conteudo.createIndex({ "url": 1 }, { unique: true })
+
+//Insere um novo registro
+db.conteudo.insertOne({
+    "tipo": "Video",
+    "categoria": "Ansiedade",
+    "titulo": "Como controlar uma crise de ansiedade?",
+    "descricao": "Video ensinando como controlar uma crise de ansiedade",
+    "url": "https://mind-app-bucket.s3.sa-east-1.amazonaws.com/videos/como_controlar_a_ansiedade.mp4"
+})

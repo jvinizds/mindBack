@@ -7,6 +7,9 @@ db.createCollection("plano", {
             bsonType: "object",
             required: ["descricao", "tipo", "valor"],
             properties: {
+                _id: { 
+                    bsonType: "objectId" 
+                },
                 descricao: {
                     bsonType: "string",
                     minLength: 2,

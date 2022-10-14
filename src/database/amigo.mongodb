@@ -11,45 +11,35 @@ db.createCollection("amigo", {
             bsonType: "object",
             required: [],
             properties: {
-                amigos: {
-                    bsonType: "array",
-                    uniqueItems: true,
-                    additionalProperties: false,
-                    items:{
-                        bsonType: "object",
-                        required: ["amigo_id", "amigo_nome"],
-                        properties: {
-                            requerente: {
-                                bsonType: "string",
-                                pattern: "/^[0-9a-fA-F]{24}$/",
-                                description: "Id do amigo é obrigatorio"
-                            },
-                            recebedor: {
-                                bsonType: "string",
-                                minLength: 2,
-                                maxLength: 100,
-                                description: "Nome deve ser um texto entre 2 a 100 caracteres e é obrigatório"
-                            },
-                            amigo_status: {
-                                enum: ["0", "1", "2"],
-                                description: 'Status deve ser 0 (Requisitado), 1 (Pendente) ou 2 (Amigos)'
-                            },
-                            amigo_data_requisicao: {
-                                enum: ["0", "1", "2"],
-                                description: 'Status deve ser 0 (Requisitado), 1 (Pendente) ou 2 (Amigos)'
-                            },
-                            amigo_data_resposta: {
-                                enum: ["0", "1", "2"],
-                                description: 'Status deve ser 0 (Requisitado), 1 (Pendente) ou 2 (Amigos)'
-                            }
-                        }
-                    }
+                _id: { 
+                    bsonType: "objectId" 
                 },
-                
+                requerente: {
+                    bsonType: "string",
+                    pattern: "/^[0-9a-fA-F]{24}$/",
+                    description: "Id do amigo é obrigatorio"
+                },
+                recebedor: {
+                    bsonType: "string",
+                    minLength: 2,
+                    maxLength: 100,
+                    description: "Nome deve ser um texto entre 2 a 100 caracteres e é obrigatório"
+                },
+                amigo_status: {
+                    enum: ["0", "1", "2"],
+                    description: 'Status deve ser 0 (Requisitado), 1 (Pendente) ou 2 (Amigos)'
+                },
+                amigo_data_requisicao: {
+                    enum: ["0", "1", "2"],
+                    description: 'Status deve ser 0 (Requisitado), 1 (Pendente) ou 2 (Amigos)'
+                },
+                amigo_data_resposta: {
+                    enum: ["0", "1", "2"],
+                    description: 'Status deve ser 0 (Requisitado), 1 (Pendente) ou 2 (Amigos)'
+                }
             }
         }
     },
     validationLevel: "off", //strict-> aplica no insert e no update. moderate apenas no insert or off
     validationAction: "error" //error->rejeita o documento ou warn->registra no log mas permite a inclusão
-
 })

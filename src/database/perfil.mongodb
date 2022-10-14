@@ -1,11 +1,10 @@
 //Selecione o database
 use("mind")
 
-// Remove collection
+// Remove collection perfil
 db.perfil.drop()
 
-// Cria collection com a validação do schema
-
+// Cria collection perfil com a validação do schema
 db.createCollection("perfil", {
     validator: {
         $jsonSchema: {
@@ -241,7 +240,7 @@ db.createCollection("perfil", {
             additionalProperties: false
         }
     },
-    validationLevel: "strict", //strict aplica no insert e no update, moderate insert ou off
+    validationLevel: "moderate", //strict aplica no insert e no update, moderate insert ou off
     validationAction: "error" //error rejeita o documento ou warn inclui e registra no log
 })
 
