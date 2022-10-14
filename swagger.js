@@ -26,7 +26,7 @@ const doc = {
             error: "Erro gerado pela aplicação"
             
         },
-        DadosPerfil: {
+        Perfil: {
             cpf: "47231369752",
             nome: "João Vinicius",
             sobrenome: "Santos",
@@ -43,15 +43,22 @@ const doc = {
             },
             login: {
                 login_email: "joaoviniciuszds@gmail.com",
-                login_senha: "Jv159357!"
+                login_senha: "Senha"
             }
+        },
+        Conteudo: {
+            tipo: "Video",
+            categoria: "Ansiedade",
+            titulo: "Sabe o que é ansiedade?",
+            descricao: "Video ensinando o que é ansiedade",
+            url: "https://mind-app-bucket.s3.sa-east-1.amazonaws.com/imagens_perfil/ad50318226c1e5b5371b816fdc67d3c8-default-user.png"
         }
     }
 
 }
 
 const outputFile = './src/swagger/swagger_output.json'
-const endpointsFiles = ['./src/app.js']
+const endpointsFiles = ['./src/index.js']
 const options = {
     swagger: '2.0',
     language: 'pt-BR',
