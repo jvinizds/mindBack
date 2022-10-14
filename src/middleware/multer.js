@@ -39,30 +39,49 @@ const multerConfig = (pasta) => {
         },
         fileFilter: (req, file, cb) => {
 
-            const tiposPermitidos = {
-                arquivos_texto: [
-                    "text/plain"
-                ], 
+            if (!req.body.id) {
+
+                return cb(new Error("Id não informado"));
+            }
+
+            if (!file) {
+
+                return cb(new Error("Arquivo não enviado no request"));
+            }
+
+            const arquivosPermitidos = {
+                arquivos_texto: {
+                    tamanho: 10,
+                    tipos: [
+                        "text/plain"
+                    ]
+                },
                 audios: [
                     "audio/mpeg"
                 ],
-                imagens_miniatura: [
-                    "image/jpeg",
-                    "image/png"
-                ],
-                imagens_perfil: [
-                    "image/jpeg",
-                    "image/png"
-                ],
+                imagens_miniatura: {
+                    tamanho: 10,
+                    tipos: [
+                        "image/jpeg",
+                        "image/png"
+                    ]
+                },
+                imagens_perfil: {
+                    tamanho: 10,
+                    tipos: [
+                        "image/jpeg",
+                        "image/png"
+                    ]
+                },
                 videos: [
                     "video/mp4"
                 ],
             }
-
-            if (tiposPermitidos[pasta].includes(file.mimetype)) {
-                cb(null, true);
+            console.log(arquivosPermitidos[pasta].tipos)
+            if (arquivosPermitidos[pasta.tipos].includes(file.mimetype)) {
+                return cb(null, true);
             } else {
-                cb(new Error("Tipo de arquivo invalido"));
+                return cb(new Error("Tipo de arquivo invalido"));
             }
         }
     }
