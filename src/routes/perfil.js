@@ -139,7 +139,7 @@ router.get("/id/:id", async (req, res) => {
             if (!err) {
                 /* 
                     #swagger.responses[200] = { 
-                        schema: { "$ref": "#/definitions/Usuário" },
+                        schema: { "$ref": "#/definitions/Perfil" },
                         description: "Consulta do perfil obtido através do id" 
                     } 
                 */
@@ -166,12 +166,12 @@ router.post('/', validaPerfilCadastroAlterar, validaPerfilCadastroInicial, async
         #swagger.description = 'Endpoint para cadastrar um novo perfil' 
     */
     /*
-        #swagger.parameters['DadosPerfil'] = {
+        #swagger.parameters['Perfil'] = {
             in: 'body',
             description: 'Informações do perfil.',
             required: true,
             type: 'object',
-            schema: { $ref: "#/definitions/DadosPerfil" }
+            schema: { $ref: "#/definitions/Perfil" }
         } 
     */
     const schemaErrors = validationResult(req)
@@ -205,12 +205,12 @@ router.put('/:id', validaPerfilCadastroAlterar, async (req, res) => {
         #swagger.description = 'Endpoint para alter informações do perfil' 
     */
     /*
-        #swagger.parameters['DadosPerfil'] = {
+        #swagger.parameters['Perfil'] = {
             in: 'body',
             description: 'Informações do perfil.',
             required: true,
             type: 'object',
-            schema: { $ref: "#/definitions/DadosPerfil" }
+            schema: { $ref: "#/definitions/Perfil" }
         } 
     */
     const schemaErrors = validationResult(req)
@@ -237,28 +237,14 @@ router.put('/:id', validaPerfilCadastroAlterar, async (req, res) => {
 })
 
 // PUT perfil/imagem
-router.put('/imagem', async (req, res) => {
+router.put('/alterar/imagem', async (req, res) => {
     /* 
         #swagger.tags = ['Imagem']
         #swagger.description = 'Endpoint que permite alterar a imagem do usuario pelo id' 
     */
     const upload = multer(multerConfig("imagens_perfil")).single("foto_perfil")
     await upload(req, res, async function (err) {
-        if (err) {
-            /*
-                #swagger.responses[500] = { 
-                    schema: { "$ref": "#/definitions/Erro" },
-                    description: "Erro ao tentar alterar a imagem de perfil" 
-                } 
-            */
-            return res.status(500).json({
-                error: err.message
-            })
-        }
-
-        const idDocumento = req.body._id
-        delete req.body._id
-
+        
         const arquivo = req.file
         if (!arquivo) {
             /*
@@ -271,6 +257,22 @@ router.put('/imagem', async (req, res) => {
                 error: "Arquivo não enviado no request"
             })
         }
+
+        if (err) {
+            /*
+                #swagger.responses[500] = { 
+                    schema: { "$ref": "#/definitions/Erro" },
+                    description: "Erro ao tentar alterar a imagem de perfil" 
+                } 
+            */
+            return res.status(500).json({
+                error: err.message
+            })
+        }
+        
+        const idPerfil = req.body.id
+        delete req.body.id
+
         const { originalname: nome, key: key, mimetype: tipo, size: tamanho, location: url = "" } = arquivo
         const dadosArquivo = {
             nome,
@@ -293,8 +295,8 @@ router.put('/imagem', async (req, res) => {
             })
         } else {
             await db.collection(nomeCollection)
-                .updateOne({ '_id': { $eq: ObjectId(idDocumento) } },
-                    { $set: dadosArquivo }
+                .updateOne({ '_id': { $eq: ObjectId(idPerfil) } },
+                    { $set: { "foto_perfil": dadosArquivo } }
                 )
                 // #swagger.responses[202] = { description: 'Imagem de perfil alterada com sucesso' }
                 .then(result => res.status(202).send(result))
@@ -372,7 +374,6 @@ router.post('/login', validaPerfilLogin, async (req, res) => {
         })
     }
 })
-
 
 //GET perfil/token
 router.get('/token', auth, async (req, res) => {

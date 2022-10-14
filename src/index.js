@@ -2,8 +2,11 @@ import express from 'express'
 import * as dotenv from 'dotenv'
 import fs from 'fs'
 import cors from 'cors'
-import rotasPerfil from './routes/perfil.js'
 import swaggerUI from 'swagger-ui-express'
+
+import rotasPerfil from './routes/perfil.js'
+import rotasConteudo from './routes/conteudo.js'
+
 const app = express();
 const PORT = process.env.PORT || 4000
 
@@ -26,6 +29,7 @@ app.get('/', (req, res) => {
 
 // Rotas 
 app.use('/perfil', rotasPerfil)
+app.use('/conteudo', rotasConteudo)
 
 app.use('/doc', swaggerUI.serve, swaggerUI.setup(JSON.parse(fs.readFileSync('./src/swagger/swagger_output.json'))))
 
