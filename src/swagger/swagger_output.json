@@ -25,7 +25,7 @@
     "application/json"
   ],
   "paths": {
-    "/api": {
+    "/": {
       "get": {
         "description": "",
         "parameters": [],
@@ -36,12 +36,160 @@
         }
       }
     },
-    "/api/perfil/id/{id}": {
+    "/perfil/id/{id}": {
       "get": {
         "tags": [
           "Perfil"
         ],
-        "description": "Endpoint que retorna os dados de um perfil filtrando pelo id",
+        "description": "Endpoint para obter o perfil usando o id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Id do Perfil",
+            "example": "6337486a5e8c178d178bf432"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Consulta do perfil obtido através do id",
+            "schema": {
+              "$ref": "#/definitions/Perfil"
+            }
+          },
+          "500": {
+            "description": "Erro ao obter o perfil filtrando pelo id",
+            "schema": {
+              "$ref": "#/definitions/Erro"
+            }
+          }
+        }
+      }
+    },
+    "/perfil/": {
+      "post": {
+        "tags": [
+          "Perfil"
+        ],
+        "description": "Endpoint para cadastrar um novo perfil",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Id do Perfil",
+            "type": "string",
+            "required": true,
+            "example": "6337486a5e8c178d178bf432"
+          },
+          {
+            "name": "Perfil",
+            "in": "body",
+            "description": "Informações do perfil.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Perfil"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Consulta do perfil obtido através do id",
+            "schema": {
+              "$ref": "#/definitions/Perfil"
+            }
+          },
+          "201": {
+            "description": "Perfil registrado com sucesso"
+          },
+          "202": {
+            "description": "Perfil deletado"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "403": {
+            "description": "Validação dos parametros enviados falhou",
+            "schema": {
+              "$ref": "#/definitions/Erro"
+            }
+          },
+          "404": {
+            "description": "Não Encontrado"
+          },
+          "500": {
+            "description": "Erro ao tentar alterar a imagem de perfil",
+            "schema": {
+              "$ref": "#/definitions/Erro"
+            }
+          }
+        }
+      }
+    },
+    "/perfil/{id}": {
+      "put": {
+        "tags": [
+          "Perfil"
+        ],
+        "description": "Endpoint para alter informações do perfil",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Id do Perfil",
+            "example": "6337486a5e8c178d178bf432"
+          },
+          {
+            "name": "Perfil",
+            "in": "body",
+            "description": "Informações do perfil.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Perfil"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Consulta do perfil obtido através do id",
+            "schema": {
+              "$ref": "#/definitions/Perfil"
+            }
+          },
+          "201": {
+            "description": "Perfil alterado com sucesso"
+          },
+          "202": {
+            "description": "Perfil deletado"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "403": {
+            "description": "Validação dos parametros enviados falhou",
+            "schema": {
+              "$ref": "#/definitions/Erro"
+            }
+          },
+          "404": {
+            "description": "Não Encontrado"
+          },
+          "500": {
+            "description": "Erro ao tentar alterar a imagem de perfil",
+            "schema": {
+              "$ref": "#/definitions/Erro"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Perfil"
+        ],
+        "description": "Endpoint para deletar um perfil pelo id",
         "parameters": [
           {
             "name": "id",
@@ -51,61 +199,16 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "400": {
-            "description": "Solicitação Inválida"
-          },
-          "500": {
-            "description": "Erro Interno do Servidor"
-          }
-        }
-      }
-    },
-    "/api/perfil/": {
-      "post": {
-        "tags": [
-          "Perfil"
-        ],
-        "description": "Endpoint para cadastrar um novo perfil",
-        "parameters": [
-          {
-            "name": "DadosPerfil",
-            "in": "body",
-            "description": "Informações do perfil.",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/DadosPerfil"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "201": {
-            "description": "Perfil registrado com sucesso!"
-          },
           "202": {
-            "description": "Aceito"
+            "description": "Perfil deletado"
           },
           "400": {
             "description": "Bad Request"
-          },
-          "403": {
-            "description": "Erro ao tentar incluir o novo perfil",
-            "schema": {
-              "$ref": "#/definitions/Erro"
-            }
-          },
-          "500": {
-            "description": "Erro Interno do Servidor"
           }
         }
       }
     },
-    "/api/perfil/imagem": {
+    "/perfil/alterar/imagem": {
       "put": {
         "tags": [
           "Imagem"
@@ -118,7 +221,7 @@
             "schema": {
               "type": "object",
               "properties": {
-                "_id": {
+                "id": {
                   "example": "any"
                 }
               }
@@ -127,13 +230,305 @@
         ],
         "responses": {
           "202": {
-            "description": "Aceito"
+            "description": "Imagem de perfil alterada com sucesso"
           },
           "400": {
-            "description": "Solicitação Inválida"
+            "description": "Bad Request"
           },
           "403": {
-            "description": "Acesso Negado"
+            "description": "Validação dos parametros enviados falhou",
+            "schema": {
+              "$ref": "#/definitions/Erro"
+            }
+          },
+          "500": {
+            "description": "Erro ao tentar alterar a imagem de perfil",
+            "schema": {
+              "$ref": "#/definitions/Erro"
+            }
+          }
+        }
+      }
+    },
+    "/perfil/login": {
+      "post": {
+        "tags": [
+          "Perfil"
+        ],
+        "description": "Endpoint para validar o login do perfil e retornar o token JWT",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Id do Perfil",
+            "type": "string",
+            "required": true,
+            "example": "6337486a5e8c178d178bf432"
+          },
+          {
+            "name": "Perfil",
+            "in": "body",
+            "description": "Informações do perfil.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Perfil"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Consulta do perfil obtido através do id",
+            "schema": {
+              "$ref": "#/definitions/Perfil"
+            }
+          },
+          "201": {
+            "description": "Perfil alterado com sucesso"
+          },
+          "202": {
+            "description": "Perfil deletado"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "403": {
+            "description": "Validação dos parametros enviados falhou",
+            "schema": {
+              "$ref": "#/definitions/Erro"
+            }
+          },
+          "404": {
+            "description": "Não Encontrado"
+          },
+          "500": {
+            "description": "Erro ao tentar alterar a imagem de perfil",
+            "schema": {
+              "$ref": "#/definitions/Erro"
+            }
+          }
+        }
+      }
+    },
+    "/perfil/token": {
+      "get": {
+        "tags": [
+          "Usuários"
+        ],
+        "description": "Endpoint para verificar se o token passado é válido",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Erro Interno do Servidor"
+          }
+        }
+      }
+    },
+    "/conteudo/": {
+      "get": {
+        "tags": [
+          "conteudo"
+        ],
+        "description": "Endpoint para obter todos os conteudos",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Consulta todos os conteudos",
+            "schema": {
+              "$ref": "#/definitions/Conteudo"
+            }
+          },
+          "500": {
+            "description": "Erro ao obter todos os conteudos",
+            "schema": {
+              "$ref": "#/definitions/Erro"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "conteudo"
+        ],
+        "description": "Endpoint para cadastrar um novo conteudo",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Id do conteudo",
+            "type": "string",
+            "required": true,
+            "example": "6345fe7a1bc5d4d93469b34c"
+          },
+          {
+            "name": "filtro",
+            "in": "path",
+            "description": "Texto do conteudo",
+            "type": "string",
+            "required": true,
+            "example": "ansieddade"
+          },
+          {
+            "name": "Conteudo",
+            "in": "body",
+            "description": "Informações do conteudo.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Conteudo"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retonro do conteudo obtido através de parte do titulo ou descrição",
+            "schema": {
+              "$ref": "#/definitions/Conteudo"
+            }
+          },
+          "201": {
+            "description": "Conteudo registrado com sucesso"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "403": {
+            "description": "Validação dos parametros enviados falhou",
+            "schema": {
+              "$ref": "#/definitions/Erro"
+            }
+          },
+          "500": {
+            "description": "Erro ao obter o conteudo filtrando pelo texto informado",
+            "schema": {
+              "$ref": "#/definitions/Erro"
+            }
+          }
+        }
+      }
+    },
+    "/conteudo/id/{id}": {
+      "get": {
+        "tags": [
+          "conteudo"
+        ],
+        "description": "Endpoint para obter o conteudo usando o id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Id do conteudo",
+            "example": "6345fe7a1bc5d4d93469b34c"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retorno do conteudo obtido através do id",
+            "schema": {
+              "$ref": "#/definitions/Conteudo"
+            }
+          },
+          "500": {
+            "description": "Erro ao obter o conteudo filtrando pelo id",
+            "schema": {
+              "$ref": "#/definitions/Erro"
+            }
+          }
+        }
+      }
+    },
+    "/conteudo/titulo/{filtro}": {
+      "get": {
+        "tags": [
+          "conteudo"
+        ],
+        "description": "Endpoint para obter o conteudo consultando por meio de parte do titulo ou descrição",
+        "parameters": [
+          {
+            "name": "filtro",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Texto do conteudo",
+            "example": "ansieddade"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retonro do conteudo obtido através de parte do titulo ou descrição",
+            "schema": {
+              "$ref": "#/definitions/Conteudo"
+            }
+          },
+          "500": {
+            "description": "Erro ao obter o conteudo filtrando pelo texto informado",
+            "schema": {
+              "$ref": "#/definitions/Erro"
+            }
+          }
+        }
+      }
+    },
+    "/conteudo/{id}": {
+      "put": {
+        "tags": [
+          "conteudo"
+        ],
+        "description": "Endpoint para alter informações do conteudo",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Id do conteudo",
+            "example": "6345fe7a1bc5d4d93469b34c"
+          },
+          {
+            "name": "filtro",
+            "in": "path",
+            "description": "Texto do conteudo",
+            "type": "string",
+            "required": true,
+            "example": "ansieddade"
+          },
+          {
+            "name": "Conteudo",
+            "in": "body",
+            "description": "Informações do conteudo.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Conteudo"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retonro do conteudo obtido através de parte do titulo ou descrição",
+            "schema": {
+              "$ref": "#/definitions/Conteudo"
+            }
+          },
+          "201": {
+            "description": "Conteudo alterado com sucesso"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "403": {
+            "description": "Validação dos parametros enviados falhou",
+            "schema": {
+              "$ref": "#/definitions/Erro"
+            }
+          },
+          "500": {
+            "description": "Erro ao obter o conteudo filtrando pelo texto informado",
+            "schema": {
+              "$ref": "#/definitions/Erro"
+            }
           }
         }
       }
@@ -143,21 +538,13 @@
     "Erro": {
       "type": "object",
       "properties": {
-        "value": {
+        "error": {
           "type": "string",
           "example": "Erro gerado pela aplicação"
-        },
-        "msg": {
-          "type": "string",
-          "example": "Mensagem detalhando o erro"
-        },
-        "param": {
-          "type": "string",
-          "example": "URL que gerou o erro"
         }
       }
     },
-    "DadosPerfil": {
+    "Perfil": {
       "type": "object",
       "properties": {
         "cpf": {
@@ -219,9 +606,34 @@
             },
             "login_senha": {
               "type": "string",
-              "example": "Jv159357!"
+              "example": "Senha"
             }
           }
+        }
+      }
+    },
+    "Conteudo": {
+      "type": "object",
+      "properties": {
+        "tipo": {
+          "type": "string",
+          "example": "Video"
+        },
+        "categoria": {
+          "type": "string",
+          "example": "Ansiedade"
+        },
+        "titulo": {
+          "type": "string",
+          "example": "Sabe o que é ansiedade?"
+        },
+        "descricao": {
+          "type": "string",
+          "example": "Video ensinando o que é ansiedade"
+        },
+        "url": {
+          "type": "string",
+          "example": "https://mind-app-bucket.s3.sa-east-1.amazonaws.com/imagens_perfil/ad50318226c1e5b5371b816fdc67d3c8-default-user.png"
         }
       }
     }
