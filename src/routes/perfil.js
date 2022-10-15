@@ -244,7 +244,18 @@ router.put('/alterar/imagem', async (req, res) => {
     */
     const upload = multer(multerConfig("imagens_perfil")).single("foto_perfil")
     await upload(req, res, async function (err) {
-        
+        if (err) {
+            /*
+                #swagger.responses[500] = { 
+                    schema: { "$ref": "#/definitions/Erro" },
+                    description: "Erro ao tentar alterar a imagem de perfil" 
+                } 
+            */
+            return res.status(500).json({
+                error: err.message
+            })
+        }
+
         const arquivo = req.file
         if (!arquivo) {
             /*
@@ -258,18 +269,6 @@ router.put('/alterar/imagem', async (req, res) => {
             })
         }
 
-        if (err) {
-            /*
-                #swagger.responses[500] = { 
-                    schema: { "$ref": "#/definitions/Erro" },
-                    description: "Erro ao tentar alterar a imagem de perfil" 
-                } 
-            */
-            return res.status(500).json({
-                error: err.message
-            })
-        }
-        
         const idPerfil = req.body.id
         delete req.body.id
 
