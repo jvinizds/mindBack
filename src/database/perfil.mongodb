@@ -9,7 +9,7 @@ db.createCollection("perfil", {
     validator: {
         $jsonSchema: {
             bsonType: "object",
-            required: ["cpf", "nome", "sobrenome", "telefone", "plano", "login", "foto_perfil"],
+            required: ["cpf", "nome", "sobrenome", "tipo_perfil", "plano_id", "telefone", "login"],
             properties: {
                 _id: { 
                     bsonType: "objectId" 
@@ -43,6 +43,11 @@ db.createCollection("perfil", {
                     bsonType: "date",
                     description: "Data de nascimento"
                 },
+                plano_id: {                    
+                    bsonType: "string",
+                    pattern: "^[0-9a-fA-F]{24}$",
+                    description: "Id do plano é obrigatorio"
+                },
                 telefone: {
                     bsonType: "object",
                     required: ["ddd", "numero"],
@@ -73,32 +78,6 @@ db.createCollection("perfil", {
                             bsonType:"string",
                             description: "Senha é obrigatorio" 
                         }
-                    }
-                },
-                plano: {
-                    bsonType: "object",
-                    required: ["id", "descricao", "tipo", "valor"],
-                    properties: {
-                        id: {
-                            pattern: "^[0-9a-fA-F]{24}$",
-                            description: "Id do plano é obrigatorio"
-                        },
-                        descricao: {
-                            bsonType: "string",
-                            minLength: 2,
-                            maxLength: 30,
-                            description: "Descrição do plano deve ser um texto entre 2 a 30 caracteres e é obrigatório"
-                        },
-                        tipo: {
-                            enum: ["Gratuito", "Pago"],
-                            description: "O tipo do conteudo deve ser 0 (Gratuito) ou 1 (Pago)"
-                        },
-                        valor: {
-                            bsonType: "number",
-                            minimum: 0,
-                            maximum: 100,
-                            description: "O preço não pode ser negativo"
-                        },
                     }
                 },
                 forma_pagamento: {
@@ -203,6 +182,10 @@ db.createCollection("perfil", {
                                 minLength: 2,
                                 maxLength: 40,
                                 description: "Titulo da conquista deve ser um texto entre 2 a 40 caracteres e é obrigatório"
+                            },
+                            data_conquista: {
+                                bsonType: "date",
+                                description: "Data da conquista"
                             }
                         }
                     }
