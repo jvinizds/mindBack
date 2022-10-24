@@ -5,7 +5,7 @@ import auth from '../middleware/auth.js'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import multer from 'multer'
-import { multerConfig } from "../middleware/multer.js"
+import { multerConfig, arquivoDelete } from "../middleware/uploadArquivos.js"
 
 const router = express.Router()
 const nomeCollection = 'perfil'
@@ -73,31 +73,25 @@ const validaPerfilCadastroAlterar = [
         }).withMessage('A senha deve conter ao menos 1 letra minúscula, 1 letra maiúscula, 1 símbolo e 1 número')
 ]
 
-const validaPerfilCadastroInicial = [
+const validaTipoPerfil = [
     check('tipo_perfil')
-        .not().isEmpty().trim().withMessage('É obrigatório informar o tipo do perfil')
-        .isIn(['Usuario', 'Admin']).withMessage('Dever ser Usuario ou Admin'),
-    check('plano.id')
-        .not().isEmpty().trim().withMessage('É obrigatório informar o id do plano'),
-    check('plano.descricao')
-        .not().isEmpty().trim().withMessage('É obrigatório informar a descrição do plano'),
-    check('plano.tipo')
-        .not().isEmpty().trim().withMessage('É obrigatório informar o tipo do plano')
-        .isIn(['Gratuito', 'Pago']).withMessage('Dever ser Gratuito ou Pago'),
-    check('plano.valor')
-        .not().isEmpty().trim().withMessage('É obrigatório informar o valor do plano')
-        .isNumeric().withMessage('O valor do plano deve conter numeros'),
-    check('foto_perfil.nome')
-        .default('default-user.png'),
-    check('foto_perfil.key')
-        .default('ad50318226c1e5b5371b816fdc67d3c8-default-user.png'),
-    check('foto_perfil.tipo')
-        .default('image/png'),
-    check('foto_perfil.tamanho')
-        .default(12372),
-    check('foto_perfil.url')
-        .default('https://mind-app-bucket.s3.sa-east-1.amazonaws.com/imagens_perfil/ad50318226c1e5b5371b816fdc67d3c8-default-user.png')
-        .isURL().withMessage('Deve ser uma URL válida')
+        .default('Usuario')
+]
+
+const validaPlano = [
+    check('plano_id')
+        .not().isEmpty().trim().withMessage('É obrigatório informar o id do plano')
+        .custom((value, { req }) => {
+            if (!ObjectId.isValid(value)) {
+                return Promise.reject('O id do plano informado está incorreto')
+            }
+            return db.collection('plano').find({ "_id": { $eq: ObjectId(value) } }).toArray()
+                .then((plano) => {
+                    if (!plano.length) {
+                        return Promise.reject('O plano informado não existe')
+                    }
+                })
+        })
 ]
 
 const validaPerfilLogin = [
@@ -117,6 +111,40 @@ const validaPerfilLogin = [
         }).withMessage('A senha deve conter ao menos 1 letra minúscula, 1 letra maiúscula, 1 símbolo e 1 número')
 ]
 
+//GET perfil/
+router.get("/", async (req, res) => {
+    /*
+        #swagger.tags = ['Perfil']
+        #swagger.description = 'Endpoint para obter todos os perfis' 
+    */
+
+    try {
+        db.collection(nomeCollection).find({}, {
+            projection: { "login.senha": false }
+        }).toArray((err, docs) => {
+            if (!err) {
+                /* 
+                    #swagger.responses[200] = { 
+                        schema: { "$ref": "#/definitions/Conteudo" },
+                        description: "Retorno de todos os perfis obtidos" 
+                    } 
+                */
+                res.status(200).json(docs)
+            }
+        })
+    } catch (err) {
+        /* 
+            #swagger.responses[500] = { 
+                schema: { "$ref": "#/definitions/Erro" },
+                description: "Erro ao obter todos os perfis" 
+            } 
+        */
+        res.status(500).json({
+            error: "Erro ao obter todos os perfis"
+        })
+    }
+})
+
 //GET perfil/id/:id
 router.get("/id/:id", async (req, res) => {
     /*
@@ -126,7 +154,7 @@ router.get("/id/:id", async (req, res) => {
     /*
         #swagger.parameters['id'] = {
             in: 'path',
-            description: 'Id do Perfil',
+            description: 'ID do Perfil',
             type: 'string',
             required: true,
             example: '6337486a5e8c178d178bf432'
@@ -160,7 +188,7 @@ router.get("/id/:id", async (req, res) => {
 })
 
 // POST perfil/
-router.post('/', validaPerfilCadastroAlterar, validaPerfilCadastroInicial, async (req, res) => {
+router.post('/', validaPerfilCadastroAlterar, validaTipoPerfil, validaPlano, async (req, res) => {
     /*  
         #swagger.tags = ['Perfil']
         #swagger.description = 'Endpoint para cadastrar um novo perfil' 
@@ -188,7 +216,6 @@ router.post('/', validaPerfilCadastroAlterar, validaPerfilCadastroInicial, async
     } else {
         const salt = await bcrypt.genSalt(10)
         req.body.login.senha = await bcrypt.hash(req.body.login.senha, salt)
-        req.body.plano.valor = Number(req.body.plano.valor)
         await db.collection(nomeCollection)
             .insertOne(req.body)
             // #swagger.responses[201] = { description: 'Perfil registrado com sucesso' }
@@ -206,13 +233,25 @@ router.put('/:id', validaPerfilCadastroAlterar, async (req, res) => {
     */
     /*
         #swagger.parameters['Perfil'] = {
-            in: 'body',
+            in: 'path',
             description: 'Informações do perfil.',
             required: true,
             type: 'object',
             schema: { $ref: "#/definitions/Perfil" }
         } 
     */
+    if (!ObjectId.isValid(req.params.id)) {
+        /*
+            #swagger.responses[403] = { 
+                schema: { "$ref": "#/definitions/Erro" },
+                description: "ID enviado está incorreto" 
+            } 
+        */
+        return res.status(403).json({
+            error: "ID enviado está incorreto"
+        })
+    }
+
     const schemaErrors = validationResult(req)
     if (!schemaErrors.isEmpty()) {
         /*
@@ -236,12 +275,46 @@ router.put('/:id', validaPerfilCadastroAlterar, async (req, res) => {
     }
 })
 
-// PUT perfil/imagem
-router.put('/alterar/imagem', async (req, res) => {
+// PUT perfil/imagem/:id
+router.put('/alterar/imagem/:id', async (req, res) => {
     /* 
         #swagger.tags = ['Imagem']
         #swagger.description = 'Endpoint que permite alterar a imagem do usuario pelo id' 
     */
+    /*
+        #swagger.parameters['Perfil'] = {
+            in: 'path',
+            description: 'ID do perfil',
+            type: 'string',
+            required: true,
+            example: '6337486a5e8c178d178bf432'
+        } 
+    */
+    const idPerfil = req.params.id
+    delete req.body.id
+
+    if (!ObjectId.isValid(idPerfil)) {
+        /*
+            #swagger.responses[403] = { 
+                schema: { "$ref": "#/definitions/Erro" },
+                description: "ID enviado está incorreto" 
+            } 
+        */
+        return res.status(403).json({
+            error: "ID enviado está incorreto"
+        })
+    }
+
+    const perfil = await db.collection(nomeCollection).find({ "_id": { $eq: ObjectId(req.params.id) } }, {
+        projection: { "login.senha": false }
+    }).limit(1).toArray()
+
+    if (!perfil.length) {
+        return res.status(404).json({
+            error: "Não foi localizado nenhum perfil com esse ID"
+        })
+    }
+
     const upload = multer(multerConfig("imagens_perfil")).single("foto_perfil")
     await upload(req, res, async function (err) {
         if (err) {
@@ -269,9 +342,6 @@ router.put('/alterar/imagem', async (req, res) => {
             })
         }
 
-        const idPerfil = req.body.id
-        delete req.body.id
-
         const { originalname: nome, key: key, mimetype: tipo, size: tamanho, location: url = "" } = arquivo
         const dadosArquivo = {
             nome,
@@ -281,27 +351,15 @@ router.put('/alterar/imagem', async (req, res) => {
             url
         }
 
-        const schemaErrors = validationResult(req)
-        if (!schemaErrors.isEmpty()) {
-            /*
-                #swagger.responses[403] = { 
-                    schema: { "$ref": "#/definitions/Erro" },
-                    description: "Validação dos parametros enviados falhou" 
-                } 
-            */
-            return res.status(403).json({
-                error: schemaErrors.array()[0].msg
-            })
-        } else {
-            await db.collection(nomeCollection)
-                .updateOne({ '_id': { $eq: ObjectId(idPerfil) } },
-                    { $set: { "foto_perfil": dadosArquivo } }
-                )
-                // #swagger.responses[202] = { description: 'Imagem de perfil alterada com sucesso' }
-                .then(result => res.status(202).send(result))
-                // #swagger.responses[400] = { description: 'Bad Request' }     
-                .catch(err => res.status(400).json({ error: error_handler(err.code) }))
-        }
+        await db.collection(nomeCollection)
+            .updateOne({ '_id': { $eq: ObjectId(idPerfil) } },
+                { $set: { "foto_perfil": dadosArquivo } }
+            )
+            // #swagger.responses[202] = { description: 'Imagem de perfil alterada com sucesso' }
+            .then(result => res.status(202).send(result))
+            // #swagger.responses[400] = { description: 'Bad Request' }     
+            .catch(err => res.status(400).json({ error: error_handler(err.code) }))
+
     })
 })
 
@@ -309,8 +367,58 @@ router.put('/alterar/imagem', async (req, res) => {
 router.delete('/:id', async (req, res) => {
     /* 
         #swagger.tags = ['Perfil']
-        #swagger.description = 'Endpoint para deletar um perfil pelo id'    
+        #swagger.description = 'Endpoint para deletar um perfil pelo ID'    
     */
+    /*
+        #swagger.parameters['Perfil'] = {
+            in: 'path',
+            description: 'ID do perfil',
+            type: 'string',
+            required: true,
+            example: '6337486a5e8c178d178bf432'
+        } 
+    */
+    const idPerfil = req.params.id
+    delete req.body.id
+
+    if (!ObjectId.isValid(idPerfil)) {
+        /*
+            #swagger.responses[403] = { 
+                schema: { "$ref": "#/definitions/Erro" },
+                description: "ID enviado está incorreto" 
+            } 
+        */
+        return res.status(403).json({
+            error: "ID enviado está incorreto"
+        })
+    }
+
+    const perfil = await db.collection(nomeCollection).find({ "_id": { $eq: ObjectId(idPerfil) } }, {
+        projection: { "login.senha": false }
+    }).limit(1).toArray()
+
+    if (!perfil.length) {
+        return res.status(404).json({
+            error: "Não foi localizado nenhum perfil com esse ID"
+        })
+    }
+
+    if (perfil[0].foto_perfil) {
+        try {
+            arquivoDelete(perfil[0].foto_perfil.key)
+        } catch (err) {
+            /*
+                #swagger.responses[500] = { 
+                    schema: { "$ref": "#/definitions/Erro" },
+                    description: "Erro ao deletar a imagem de perfil do sistema" 
+                } 
+            */
+            return res.status(500).json({
+                error: "Erro ao deletar a imagem de perfil do sistema"
+            })
+        }
+    }
+
     await db.collection(nomeCollection)
         .deleteOne({ '_id': { $eq: ObjectId(req.params.id) } })
         // #swagger.responses[202] = { description: 'Perfil deletado' }
@@ -324,6 +432,15 @@ router.post('/login', validaPerfilLogin, async (req, res) => {
     /* 
         #swagger.tags = ['Perfil']
         #swagger.description = 'Endpoint para validar o login do perfil e retornar o token JWT' 
+    */
+    /*
+        #swagger.parameters['Perfil'] = {
+            in: 'path',
+            description: 'Informações de login.',
+            required: true,
+            type: 'object',
+            schema: { $ref: "#/definitions/Login" }
+        } 
     */
     const schemaErrors = validationResult(req)
     if (!schemaErrors.isEmpty()) {
@@ -366,8 +483,7 @@ router.post('/login', validaPerfilLogin, async (req, res) => {
                 })
             }
         )
-    } catch (e) {
-        console.error(e)
+    } catch (err) {
         res.status(500).json({
             error: 'Erro ao gerar o token'
         })
@@ -379,8 +495,15 @@ router.get('/token', auth, async (req, res) => {
     /* 
         #swagger.tags = ['Usuários']
         #swagger.description = 'Endpoint para verificar se o token passado é válido' 
-     */
-
+    */
+    /*
+        #swagger.parameters['Perfil'] = {
+            in: 'header',
+            description: 'Token',
+            type: 'string',
+            required: true
+        } 
+    */
     try {
         let access_token = jwt.sign(
             { usuario: { id: req.usuario.id } },
