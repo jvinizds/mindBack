@@ -9,18 +9,10 @@ db.createCollection("conteudo", {
     validator: {
         $jsonSchema: {
             bsonType: "object",
-            required: ["tipo", "categoria", "titulo", "descricao", "url"],
+            required: ["titulo", "descricao", "tipo", "categoria", "dados_arquivo"],
             properties: {
                 _id: { 
                     bsonType: "objectId" 
-                    },
-                tipo: {
-                    enum: ["Artigo", "Audio", "Video"],
-                    description: 'O tipo do conteudo deve ser Artigo, Audio ou Video'
-                },
-                categoria: {
-                    enum: ["Ansiedade", "Ioga", "Meditação"],
-                    description: 'A categoria do conteudo deve ser Ansiedade, Ioga ou Meditação'
                 },
                 titulo: {
                     bsonType: "string",
@@ -34,10 +26,40 @@ db.createCollection("conteudo", {
                     maxLength: 100,
                     description: "Descrição do conteudo deve ser um texto entre 2 a 100 caracteres e é obrigatório"
                 }, 
-                url: {
-                    bsonType: "string",
-                    description: "URL do conteudo"
-                }         
+                tipo: {
+                    enum: ["Artigo", "Audio", "Video"],
+                    description: 'O tipo do conteudo deve ser Artigo, Audio ou Video'
+                },
+                categoria: {
+                    enum: ["Ansiedade", "Ioga", "Meditação"],
+                    description: 'A categoria do conteudo deve ser Ansiedade, Ioga ou Meditação'
+                },
+                dados_arquivo: {
+                    bsonType: "object",
+                    required: ["nome", "key", "extensao", "tamanho", "url"],
+                    properties: {
+                        nome: {
+                            bsonType: "string",
+                            description: "Nome original do arquivo do conteudo"
+                        },
+                        key: {
+                            bsonType: "string",
+                            description: "Key do arquivo do conteudo"
+                        },
+                        extensao: {
+                            bsonType: "string",
+                            description: "Extensão do arquivo do conteudo"
+                        },
+                        tamanho: {
+                            bsonType: "number",
+                            description: "Tamanho do arquivo do conteudo"
+                        },
+                        url: {
+                            bsonType: "string",
+                            description: "URL do arquivo do conteudo"
+                        }                       
+                    }        
+                }
             },
             additionalProperties: false
         }
@@ -48,7 +70,7 @@ db.createCollection("conteudo", {
 
 //Criando um índice único no campo cpf
 db.conteudo.createIndex({ "titulo": 1 }, { unique: true })
-db.conteudo.createIndex({ "url": 1 }, { unique: true })
+db.conteudo.createIndex({ "dados_arquivo.url": 1 }, { unique: true })
 
 //Insere um novo registro
 db.conteudo.insertOne({
