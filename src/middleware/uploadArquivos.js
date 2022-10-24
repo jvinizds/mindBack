@@ -2,6 +2,9 @@ import multer from "multer"
 import crypto from "crypto"
 import aws from "aws-sdk"
 import multerS3 from "multer-s3"
+import fs from "fs"
+
+const s3 = new aws.S3();
 
 const multerConfig = (pasta) => {
 
@@ -34,52 +37,42 @@ const multerConfig = (pasta) => {
     }
     return {
         storage: storageType[process.env.STORAGE_TYPE],
-        limits: {
-            fileSize: 2 * 1024 * 1024
-        },
+
         fileFilter: (req, file, cb) => {
 
-            if (!req.body.id) {
-
-                return cb(new Error("Id não informado"));
+            if (file.mimetype == "video/mp4") {
+                pasta = "videos"
             }
 
-            if (!file) {
-
-                return cb(new Error("Arquivo não enviado no request"));
-            }
-
-            const arquivosPermitidos = {
-                arquivos_texto: {
-                    tamanho: 10,
-                    tipos: [
-                        "text/plain"
-                    ]
-                },
+            const tiposPermitidos = {
+                arquivos_texto: [
+                    "text/plain"
+                ],
                 audios: [
                     "audio/mpeg"
                 ],
-                imagens_miniatura: {
-                    tamanho: 10,
-                    tipos: [
-                        "image/jpeg",
-                        "image/png"
-                    ]
-                },
-                imagens_perfil: {
-                    tamanho: 10,
-                    tipos: [
-                        "image/jpeg",
-                        "image/png"
-                    ]
-                },
+                imagens_perfil: [
+                    "image/jpeg",
+                    "image/png"
+                ],
                 videos: [
                     "video/mp4"
                 ],
             }
-            console.log(arquivosPermitidos[pasta].tipos)
-            if (arquivosPermitidos[pasta.tipos].includes(file.mimetype)) {
-                return cb(null, true);
+
+            const tamanhosPermitidos = {
+                arquivos_texto: 2097152, // 2 MB
+                audios: 10485760, // 10 MB
+                imagens_perfil: 2097152, // 2 MB
+                videos: 20971520, // 20 MB
+            }
+
+            if (tiposPermitidos[pasta].includes(file.mimetype)) {
+                if (req.headers['content-length'] < tamanhosPermitidos[pasta]) {
+                    return cb(null, true);
+                } else {
+                    return cb(new Error("Tamanho do arquivo invalido"));
+                }
             } else {
                 return cb(new Error("Tipo de arquivo invalido"));
             }
@@ -87,4 +80,19 @@ const multerConfig = (pasta) => {
     }
 }
 
-export { multerConfig }
+const arquivoDelete = (key) => {
+    if (process.env.STORAGE_TYPE === "s3") {
+        s3.deleteObject({
+            Bucket: process.env.AWS_BUCKET_NAME,
+            Key: key
+        }, (err) => {
+            if (err) throw err
+        })
+    } else {
+        fs.unlink(`public/${key}`, function (err) {
+            if (err) throw err
+        })
+    }
+}
+
+export { multerConfig, arquivoDelete }
