@@ -40,12 +40,26 @@ const multerConfig = (pasta) => {
 
         fileFilter: (req, file, cb) => {
 
-            if (file.mimetype == "video/mp4") {
-                pasta = "videos"
+            switch (file.mimetype) {
+                case "text/plain":
+                    pasta = "artigos"
+                    break;
+                case "audio/mpeg":
+                    pasta = "audios"
+                    break;
+                case "image/jpeg":
+                    pasta = "imagens_perfil"
+                    break;
+                case "image/png":
+                    pasta = "imagens_perfil"
+                    break;
+                case "video/mp4":
+                    pasta = "videos"
+                    break;
             }
 
             const tiposPermitidos = {
-                arquivos_texto: [
+                artigos: [
                     "text/plain"
                 ],
                 audios: [
@@ -61,7 +75,7 @@ const multerConfig = (pasta) => {
             }
 
             const tamanhosPermitidos = {
-                arquivos_texto: 2097152, // 2 MB
+                artigos: 2097152, // 2 MB
                 audios: 10485760, // 10 MB
                 imagens_perfil: 2097152, // 2 MB
                 videos: 20971520, // 20 MB
