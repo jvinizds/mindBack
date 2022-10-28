@@ -269,7 +269,6 @@ router.post('/', validaConteudo, async (req, res) => {
         }
 
         const schemaErrors = validationResult(req)
-
         if (!schemaErrors.isEmpty()) {
             try {
                 arquivoDelete(arquivo.key)
