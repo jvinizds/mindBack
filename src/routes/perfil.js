@@ -73,9 +73,15 @@ const validaPerfilCadastroAlterar = [
         }).withMessage('A senha deve conter ao menos 1 letra minúscula, 1 letra maiúscula, 1 símbolo e 1 número')
 ]
 
-const validaTipoPerfil = [
+const validaTipoPerfilProgresso = [
     check('tipo_perfil')
-        .default('Usuario')
+        .default('Usuario'),
+    check('progresso.artigo')
+        .default(0),
+    check('progresso.audio')
+        .default(0),
+    check('progresso.video')
+        .default(0),
 ]
 
 const validaPlano = [
@@ -149,7 +155,7 @@ router.get("/", async (req, res) => {
 router.get("/id/:id", async (req, res) => {
     /*
         #swagger.tags = ['Perfil']
-        #swagger.description = 'Endpoint para obter o perfil usando o id' 
+        #swagger.description = 'Endpoint para obter o perfil usando o ID' 
     */
     /*
         #swagger.parameters['id'] = {
@@ -168,7 +174,7 @@ router.get("/id/:id", async (req, res) => {
                 /* 
                     #swagger.responses[200] = { 
                         schema: { "$ref": "#/definitions/Perfil" },
-                        description: "Consulta do perfil obtido através do id" 
+                        description: "Consulta do perfil obtido através do ID" 
                     } 
                 */
                 res.status(200).json(docs)
@@ -178,17 +184,17 @@ router.get("/id/:id", async (req, res) => {
         /* 
             #swagger.responses[500] = { 
                 schema: { "$ref": "#/definitions/Erro" },
-                description: "Erro ao obter o perfil filtrando pelo id" 
+                description: "Erro ao obter o perfil filtrando pelo ID" 
             } 
         */
         res.status(500).json({
-            error: "Erro ao obter o perfil pelo id"
+            error: "Erro ao obter o perfil pelo ID"
         })
     }
 })
 
 // POST perfil/
-router.post('/', validaPerfilCadastroAlterar, validaTipoPerfil, validaPlano, async (req, res) => {
+router.post('/', validaPerfilCadastroAlterar, validaTipoPerfilProgresso, validaPlano, async (req, res) => {
     /*  
         #swagger.tags = ['Perfil']
         #swagger.description = 'Endpoint para cadastrar um novo perfil' 
@@ -213,23 +219,24 @@ router.post('/', validaPerfilCadastroAlterar, validaTipoPerfil, validaPlano, asy
         return res.status(403).json({
             error: schemaErrors.array()[0].msg
         })
-    } else {
-        const salt = await bcrypt.genSalt(10)
-        req.body.login.senha = await bcrypt.hash(req.body.login.senha, salt)
-        await db.collection(nomeCollection)
-            .insertOne(req.body)
-            // #swagger.responses[201] = { description: 'Perfil registrado com sucesso' }
-            .then(result => res.status(201).send(result))
-            // #swagger.responses[400] = { description: 'Bad Request' }     
-            .catch(err => res.status(400).json({ error: error_handler(err.code) }))
     }
+
+    const salt = await bcrypt.genSalt(10)
+    req.body.login.senha = await bcrypt.hash(req.body.login.senha, salt)
+    await db.collection(nomeCollection)
+        .insertOne(req.body)
+        // #swagger.responses[201] = { description: 'Perfil registrado com sucesso' }
+        .then(result => res.status(201).send(result))
+        // #swagger.responses[400] = { description: 'Bad Request' }     
+        .catch(err => res.status(400).json({ error: error_handler(err.code) }))
+
 })
 
 // PUT perfil/:id
 router.put('/:id', validaPerfilCadastroAlterar, async (req, res) => {
     /*  
         #swagger.tags = ['Perfil']
-        #swagger.description = 'Endpoint para alter informações do perfil' 
+        #swagger.description = 'Endpoint para alterar informações do perfil' 
     */
     /*
         #swagger.parameters['Perfil'] = {
@@ -279,7 +286,7 @@ router.put('/:id', validaPerfilCadastroAlterar, async (req, res) => {
 router.put('/alterar/imagem/:id', async (req, res) => {
     /* 
         #swagger.tags = ['Imagem']
-        #swagger.description = 'Endpoint que permite alterar a imagem do usuario pelo id' 
+        #swagger.description = 'Endpoint que permite alterar a imagem do usuario pelo ID' 
     */
     /*
         #swagger.parameters['Perfil'] = {
@@ -315,7 +322,7 @@ router.put('/alterar/imagem/:id', async (req, res) => {
         })
     }
 
-    const upload = multer(multerConfig("imagens_perfil")).single("foto_perfil")
+    const upload = multer(multerConfig("")).single("foto_perfil")
     await upload(req, res, async function (err) {
         if (err) {
             /*
@@ -356,7 +363,24 @@ router.put('/alterar/imagem/:id', async (req, res) => {
                 { $set: { "foto_perfil": dadosArquivo } }
             )
             // #swagger.responses[202] = { description: 'Imagem de perfil alterada com sucesso' }
-            .then(result => res.status(202).send(result))
+            .then(result => {
+                if (perfil[0].foto_perfil) {
+                    try {
+                        arquivoDelete(perfil[0].foto_perfil.key)
+                    } catch (err) {
+                        /*
+                            #swagger.responses[500] = { 
+                                schema: { "$ref": "#/definitions/Erro" },
+                                description: "Erro ao deletar a imagem de perfil do sistema" 
+                            } 
+                        */
+                        return res.status(500).json({
+                            error: "Erro ao deletar a imagem de perfil do sistema"
+                        })
+                    }
+                }
+                res.status(202).send(result)
+            })
             // #swagger.responses[400] = { description: 'Bad Request' }     
             .catch(err => res.status(400).json({ error: error_handler(err.code) }))
 
@@ -403,26 +427,27 @@ router.delete('/:id', async (req, res) => {
         })
     }
 
-    if (perfil[0].foto_perfil) {
-        try {
-            arquivoDelete(perfil[0].foto_perfil.key)
-        } catch (err) {
-            /*
-                #swagger.responses[500] = { 
-                    schema: { "$ref": "#/definitions/Erro" },
-                    description: "Erro ao deletar a imagem de perfil do sistema" 
-                } 
-            */
-            return res.status(500).json({
-                error: "Erro ao deletar a imagem de perfil do sistema"
-            })
-        }
-    }
-
     await db.collection(nomeCollection)
         .deleteOne({ '_id': { $eq: ObjectId(req.params.id) } })
         // #swagger.responses[202] = { description: 'Perfil deletado' }
-        .then(result => res.status(202).send(result))
+        .then(result => {
+            if (perfil[0].foto_perfil) {
+                try {
+                    arquivoDelete(perfil[0].foto_perfil.key)
+                } catch (err) {
+                    /*
+                        #swagger.responses[500] = { 
+                            schema: { "$ref": "#/definitions/Erro" },
+                            description: "Erro ao deletar a imagem de perfil do sistema" 
+                        } 
+                    */
+                    return res.status(500).json({
+                        error: "Erro ao deletar a imagem de perfil do sistema"
+                    })
+                }
+            }
+            res.status(202).send(result)
+        })
         // #swagger.responses[400] = { description: 'Bad Request' }     
         .catch(err => res.status(400).json({ error: error_handler(err.code) }))
 })
@@ -518,5 +543,7 @@ router.get('/token', auth, async (req, res) => {
         })
     }
 })
+
+
 
 export default router

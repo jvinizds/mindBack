@@ -135,7 +135,7 @@ db.createCollection("perfil", {
                 conteudo_recente: {
                     bsonType: "array",
                     uniqueItems: true,
-                    maxItems: 10,
+                    maxItems: 20,
                     additionalProperties: false,
                     items:{
                         bsonType: "object",
@@ -161,6 +161,23 @@ db.createCollection("perfil", {
                                 description: "Titulo do conteudo deve ser um texto entre 2 a 40 caracteres e é obrigatório"
                             }
                         }
+                    }
+                },
+                progresso: {
+                    bsonType: "object",
+                    properties: {
+                        artigo: {
+                            bsonType: "number",
+                            description: "Quantidade de artigos já vistos pelo usuario"
+                        },
+                        audio: {
+                            bsonType: "number",
+                            description: "Quantidade de audios já vistos pelo usuario"
+                        },
+                        video: {
+                            bsonType: "number",
+                            description: "Quantidade de videos já vistos pelo usuario"
+                        }                     
                     }
                 },
                conquistas: {
@@ -245,10 +262,5 @@ db.perfil.insertOne({
             "email": "joaoviniciuszds@gmail.com",
             "senha": "Jv159357!"
     },
-    "plano": {
-        "id": "6331bdd97a625c4641e95715",
-        "descricao": "Plano premium",
-        "tipo": "Pago",
-        "valor": 19.9
-    }
+    "plano_id": "6331bdd97a625c4641e95715"
 })
