@@ -1,0 +1,44 @@
+//Selecione o database
+use("mind")
+
+// Remove collection conteudo
+db.historico.drop()
+
+// Cria collection conteudo com a validação do schema
+db.createCollection("historico", {
+    validator: {
+        $jsonSchema: {
+            bsonType: "object",
+            required: ["perfil_id", "conteudo_id", "data_historico"],
+            properties: {
+                _id: { 
+                    bsonType: "objectId" 
+                },
+                perfil_id: {
+                    bsonType: "objectId"
+                },
+                conteudo_id: {
+                    bsonType: "objectId"
+                }, 
+                data_historico: {
+                    bsonType: "date",
+                    description: "Data de acesso ao conteúdo"
+                }               
+            },
+            additionalProperties: false
+        }
+    },
+    validationLevel: "moderate", //strict aplica no insert e no update, moderate no insert ou off
+    validationAction: "error" //error rejeita o documento ou warn inclui e registra no log
+})
+
+//Criando um índice único no campo cpf
+db.historico.createIndex({ "perfil_id": 1 })
+db.historico.createIndex({ "conteudo_id": 1 })
+
+//Insere um novo registro
+db.historico.insertOne({
+    "perfil_id": "6356ad635deae9ab35e2d925",
+    "conteudo_id": "6355842f6cfab022c939e21d",
+    "data_acesso": "Como controlar uma crise de ansiedade?"
+})
