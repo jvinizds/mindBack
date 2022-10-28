@@ -139,13 +139,25 @@ db.createCollection("perfil", {
                     additionalProperties: false,
                     items:{
                         bsonType: "object",
-                        required: ["id", "tipo", "titulo"],
+                        required: ["conteudo_id", "titulo", "descricao", "tipo", "categoria", "url", "data_historico"],
                         properties: {
-                            id: {
+                            conteudo_id: {
                                 bsonType: "string",
                                 pattern: "^[0-9a-fA-F]{24}$",
                                 description: "Id do conteudo é obrigatorio"
                             },
+                            titulo: {
+                                bsonType: "string",
+                                minLength: 2,
+                                maxLength: 40,
+                                description: "Titulo do conteudo deve ser um texto entre 2 a 40 caracteres e é obrigatório"
+                            },
+                            descricao: {
+                                bsonType: "string",
+                                minLength: 2,
+                                maxLength: 100,
+                                description: "Descrição do conteudo deve ser um texto entre 2 a 100 caracteres e é obrigatório"
+                            }, 
                             tipo: {
                                 enum: ["Artigo", "Audio", "Video"],
                                 description: 'O tipo do conteudo deve ser Artigo, Audio ou Video'
@@ -154,12 +166,14 @@ db.createCollection("perfil", {
                                 enum: ["Ansiedade", "Ioga", "Meditação"],
                                 description: 'A categoria do conteudo deve ser Ansiedade, Ioga ou Meditação'
                             },
-                            titulo: {
+                            url: {
                                 bsonType: "string",
-                                minLength: 2,
-                                maxLength: 40,
-                                description: "Titulo do conteudo deve ser um texto entre 2 a 40 caracteres e é obrigatório"
-                            }
+                                description: "URL do arquivo do conteudo"
+                            }, 
+                            data_historico: {
+                                bsonType: "date",
+                                description: "Data de acesso ao conteúdo"
+                            }      
                         }
                     }
                 },

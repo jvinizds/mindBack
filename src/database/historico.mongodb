@@ -15,10 +15,14 @@ db.createCollection("historico", {
                     bsonType: "objectId" 
                 },
                 perfil_id: {
-                    bsonType: "objectId"
+                    bsonType: "string",
+                    pattern: "^[0-9a-fA-F]{24}$",
+                    description: "Id do perfil é obrigatorio"
                 },
                 conteudo_id: {
-                    bsonType: "objectId"
+                    bsonType: "string",
+                    pattern: "^[0-9a-fA-F]{24}$",
+                    description: "Id do conteudo é obrigatorio"
                 }, 
                 data_historico: {
                     bsonType: "date",

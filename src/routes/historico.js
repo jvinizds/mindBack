@@ -21,9 +21,7 @@ const validaHistorico = [
             if (!ObjectId.isValid(value)) {
                 return Promise.reject('O id do conteudo informado está incorreto')
             }
-        }),
-    check('data_historico')
-        .default(new Date())
+        })
 ]
 
 //GET historico/
@@ -212,7 +210,11 @@ router.post('/', validaHistorico, async (req, res) => {
         })
     }
 
-    const perfil = await db.collection('perfil').find({ "_id": { $eq: ObjectId(req.body.perfil_id) } }).toArray()
+    const perfil_id = req.body.perfil_id
+    const conteudo_id = req.body.conteudo_id
+    const data_historico = new Date(Date.now())
+
+    const perfil = await db.collection('perfil').find({ "_id": { $eq: ObjectId(perfil_id) } }).toArray()
     if (!perfil.length) {
         /*
             #swagger.responses[404] = { 
@@ -225,7 +227,7 @@ router.post('/', validaHistorico, async (req, res) => {
         })
     }
 
-    const conteudo = await db.collection('conteudo').find({ "_id": { $eq: ObjectId(req.body.conteudo_id) } }).toArray()
+    const conteudo = await db.collection('conteudo').find({ "_id": { $eq: ObjectId(conteudo_id) } }).toArray()
     if (!conteudo.length) {
         /*
             #swagger.responses[404] = { 
@@ -238,8 +240,7 @@ router.post('/', validaHistorico, async (req, res) => {
         })
     }
 
-    req.body.perfil_id = new ObjectId(req.body.perfil_id)
-    req.body.conteudo_id = new ObjectId(req.body.conteudo_id)
+    const historico = { perfil_id: perfil_id, conteudo_id: conteudo_id, data_historico: data_historico }
 
     const progresso = { artigo: perfil[0].progresso.artigo, audio: perfil[0].progresso.audio, video: perfil[0].progresso.video }
 
@@ -255,19 +256,68 @@ router.post('/', validaHistorico, async (req, res) => {
             break;
     }
 
+    const conteudo_recente = { conteudo_id: conteudo_id, titulo: conteudo[0].titulo, descricao: conteudo[0].descricao, tipo: conteudo[0].tipo, categoria: conteudo[0].categoria, url: conteudo[0].dados_arquivo.url, data_historico: data_historico }
+
+    if (perfil[0].conteudo_recente && perfil[0].conteudo_recente.some(conteudo => conteudo.conteudo_id == conteudo_id)) {
+        try {
+            await db.collection("perfil")
+                .updateOne({ '_id': { $eq: ObjectId(perfil_id) } },
+                    {
+                        $pull: { "conteudo_recente": { conteudo_id: conteudo_id } }
+                    }
+                )
+        }
+        catch (err) {
+            /* 
+                #swagger.responses[500] = { 
+                    schema: { "$ref": "#/definitions/Erro" },
+                    description: "Erro ao incluir novo conteudo recente, visto que não foi possivel excluir outro conteudo que já existia" 
+                } 
+            */
+            res.status(500).json({
+                error: "Erro ao incluir novo conteudo recente, visto que não foi possivel excluir outro conteudo que já existia"
+            })
+        }
+    }
+
+    if (perfil[0].conteudo_recente.length == 20) {
+        try {
+            await db.collection("perfil")
+                .updateOne({ '_id': { $eq: ObjectId(perfil_id) } },
+                    {
+                        $pull: { "conteudo_recente": { conteudo_id: perfil[0].conteudo_recente[0].conteudo_id } }
+                    }
+                )
+        }
+        catch (err) {
+            /* 
+                #swagger.responses[500] = { 
+                    schema: { "$ref": "#/definitions/Erro" },
+                    description: "Erro ao incluir novo conteudo recente, visto que não foi possivel excluir outro conteudo que já existia" 
+                } 
+            */
+            res.status(500).json({
+                error: "Erro ao incluir novo conteudo recente, visto que não foi possivel excluir outro conteudo que já existia"
+            })
+        }
+    }
+
     await db.collection(nomeCollection)
-        .insertOne(req.body)
+        .insertOne(historico)
         .then(async (result) => {
             await db.collection("perfil")
-                .updateOne({ '_id': { $eq: ObjectId(req.body.perfil_id) } },
-                    { $set: { "progresso": progresso } }
+                .updateOne({ '_id': { $eq: ObjectId(perfil_id) } },
+                    {
+                        $set: { progresso: progresso },
+                        $push: { conteudo_recente: conteudo_recente }
+                    }
                 )
                 // #swagger.responses[201] = { description: 'Historico registrado com sucesso' }
                 .then(() => {
                     res.status(201).send(result)
                 })
                 // #swagger.responses[400] = { description: 'Bad Request' }     
-                .catch(err => res.status(400).json({ error: error_handler(err.code) }))
+                .catch(err => res.status(400).json({ error: err }))
         })
         .catch(err => {
             /*
@@ -276,7 +326,7 @@ router.post('/', validaHistorico, async (req, res) => {
                     description: "Bad Request" 
                 } 
             */
-            return res.status(400).json(err)
+            return res.status(400).json({ error: error_handler(err.code) })
         })
 })
 
