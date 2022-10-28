@@ -241,7 +241,7 @@ router.post('/', validaConteudo, async (req, res) => {
             schema: { $ref: "#/definitions/Conteudo" }
         } 
     */
-    const upload = multer(multerConfig("conteudo")).single("video")
+    const upload = multer(multerConfig("conteudo")).single("arquivo")
     await upload(req, res, async function (err) {
         if (err) {
             /*
@@ -268,7 +268,7 @@ router.post('/', validaConteudo, async (req, res) => {
             })
         }
 
-        const schemaErrors = validationResult(req)
+        const schemaErrors = validationResult(req.body)
         if (!schemaErrors.isEmpty()) {
             try {
                 arquivoDelete(arquivo.key)
@@ -374,7 +374,7 @@ router.put('/:id', validaConteudo, async (req, res) => {
         })
     }
 
-    const upload = multer(multerConfig("conteudo")).single("video")
+    const upload = multer(multerConfig("conteudo")).single("arquivo")
     await upload(req, res, async function (err) {
         if (err) {
             /*

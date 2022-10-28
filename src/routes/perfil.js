@@ -322,7 +322,7 @@ router.put('/alterar/imagem/:id', async (req, res) => {
         })
     }
 
-    const upload = multer(multerConfig("")).single("foto_perfil")
+    const upload = multer(multerConfig("")).single("arquivo")
     await upload(req, res, async function (err) {
         if (err) {
             /*
