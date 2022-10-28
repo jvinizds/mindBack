@@ -23,8 +23,7 @@ const doc = {
     },
     definitions: {
         Erro: {
-            error: "Erro gerado pela aplicação"
-            
+            error: "Mensagem detalhando o erro"
         },
         Perfil: {
             cpf: "47231369752",
@@ -32,26 +31,25 @@ const doc = {
             sobrenome: "Santos",
             tipo_perfil: "Usuario",
             telefone: {
-                telefone_ddd: "11",
-                telefone_numero: "975003307"
+                ddd: "11",
+                numero: "975003307"
             },
-            plano: {
-                plano_id: "6331bdd97a625c4641e95715",
-                plano_descricao: "Plano premium",
-                plano_tipo: "Pago",
-                plano_valor: 19
-            },
+            plano_id: "6331bdd97a625c4641e95715",
             login: {
-                login_email: "joaoviniciuszds@gmail.com",
-                login_senha: "Senha"
+                email: "joaoviniciuszds@gmail.com",
+                senha: "Senha"
             }
         },
         Conteudo: {
-            tipo: "Video",
-            categoria: "Ansiedade",
             titulo: "Sabe o que é ansiedade?",
             descricao: "Video ensinando o que é ansiedade",
-            url: "https://mind-app-bucket.s3.sa-east-1.amazonaws.com/imagens_perfil/ad50318226c1e5b5371b816fdc67d3c8-default-user.png"
+            tipo: "Video",
+            categoria: "Ansiedade",
+            video: "Arquivo"
+        },
+        Historico: {
+            perfil_id: "6356ad635deae9ab35e2d925",
+            conteudo_id: "6355842f6cfab022c939e21d"
         }
     }
 
