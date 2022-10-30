@@ -72,6 +72,18 @@ router.get("/id/:id", async (req, res) => {
             example: '6345fe7a1bc5d4d93469b34c'
         } 
     */
+    if(!ObjectId.isValid(req.params.id)) {
+        /*
+            #swagger.responses[403] = { 
+                schema: { "$ref": "#/definitions/Erro" },
+                description: "ID enviado está incorreto" 
+            } 
+        */
+        return res.status(403).json({
+            error: "ID enviado está incorreto"
+        })
+    } 
+
     try {
         db.collection(nomeCollection).find({ "_id": { $eq: ObjectId(req.params.id) } })
             .limit(1).toArray((err, docs) => {

@@ -71,6 +71,18 @@ router.get("/id/:id", async (req, res) => {
             example: '6355842f6cfab022c939e21d'
         } 
     */
+    if (!ObjectId.isValid(req.params.id)) {
+        /*
+            #swagger.responses[403] = { 
+                schema: { "$ref": "#/definitions/Erro" },
+                description: "ID enviado está incorreto" 
+            } 
+        */
+        return res.status(403).json({
+            error: "ID enviado está incorreto"
+        })
+    } 
+
     try {
         db.collection(nomeCollection).find({
             "_id": { $eq: ObjectId(req.params.id) }
@@ -113,6 +125,18 @@ router.get("/perfil/id/:id", async (req, res) => {
             example: '6356ad635deae9ab35e2d925'
         } 
     */
+    if (!ObjectId.isValid(req.params.id)) {
+        /*
+            #swagger.responses[403] = { 
+                schema: { "$ref": "#/definitions/Erro" },
+                description: "ID enviado está incorreto" 
+            } 
+        */
+        return res.status(403).json({
+            error: "ID enviado está incorreto"
+        })
+    } 
+
     try {
         db.collection(nomeCollection).find({
             "perfil_id": { $eq: ObjectId(req.params.id) }
@@ -155,6 +179,18 @@ router.get("/conteudo/id/:id", async (req, res) => {
             example: '6355842f6cfab022c939e21d'
         } 
     */
+    if (!ObjectId.isValid(req.params.id)) {
+        /*
+            #swagger.responses[403] = { 
+                schema: { "$ref": "#/definitions/Erro" },
+                description: "ID enviado está incorreto" 
+            } 
+        */
+        return res.status(403).json({
+            error: "ID enviado está incorreto"
+        })
+    } 
+
     try {
         db.collection(nomeCollection).find({
             "conteudo_id": { $eq: ObjectId(req.params.id) }

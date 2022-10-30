@@ -166,6 +166,18 @@ router.get("/id/:id", async (req, res) => {
             example: '6337486a5e8c178d178bf432'
         } 
     */
+    if (!ObjectId.isValid(req.params.id)) {
+        /*
+            #swagger.responses[403] = { 
+                schema: { "$ref": "#/definitions/Erro" },
+                description: "ID enviado está incorreto" 
+            } 
+        */
+        return res.status(403).json({
+            error: "ID enviado está incorreto"
+        })
+    } 
+
     try {
         db.collection(nomeCollection).find({ "_id": { $eq: ObjectId(req.params.id) } }, {
             projection: { "login.senha": false }
@@ -233,7 +245,7 @@ router.post('/', validaPerfilCadastroAlterar, validaTipoPerfilProgresso, validaP
 })
 
 // PUT perfil/:id
-router.put('/:id', validaPerfilCadastroAlterar, async (req, res) => {
+router.put('/:id', validaPerfilCadastroAlterar, validaPlano, async (req, res) => {
     /*  
         #swagger.tags = ['Perfil']
         #swagger.description = 'Endpoint para alterar informações do perfil' 
@@ -278,7 +290,7 @@ router.put('/:id', validaPerfilCadastroAlterar, async (req, res) => {
             // #swagger.responses[201] = { description: 'Perfil alterado com sucesso' }
             .then(result => res.status(201).send(result))
             // #swagger.responses[400] = { description: 'Bad Request' }     
-            .catch(err => res.status(400).json({ error: error_handler(err.code) }))
+            .catch(err => res.status(400).json({ error: err }))
     }
 })
 
