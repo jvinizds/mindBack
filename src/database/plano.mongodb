@@ -5,15 +5,21 @@ db.createCollection("plano", {
     validator: {
         $jsonSchema: {
             bsonType: "object",
-            required: ["descricao", "tipo", "valor"],
+            required: ["nome", "descricao", "tipo", "valor"],
             properties: {
                 _id: { 
                     bsonType: "objectId" 
                 },
+                nome: {
+                    bsonType: "string",
+                    minLength: 2,
+                    maxLength: 40,
+                    description: "Descrição do plano deve ser um texto entre 2 a 30 caracteres e é obrigatório"
+                },
                 descricao: {
                     bsonType: "string",
                     minLength: 2,
-                    maxLength: 30,
+                    maxLength: 100,
                     description: "Descrição do plano deve ser um texto entre 2 a 30 caracteres e é obrigatório"
                 },
                 tipo: {
@@ -29,10 +35,14 @@ db.createCollection("plano", {
             }  
         }
     },
-    validationLevel: "strict", //strict aplica no insert e no update, moderate no insert ou off
+    validationLevel: "moderate", //strict aplica no insert e no update, moderate no insert ou off
     validationAction: "error" //error rejeita o documento ou warn inclui e registra no log
 })
+
+db.plano.createIndex({ "nome": 1 }, { unique: true })
+
 db.plano.insertOne({
+    "nome": "Plano 2022 premium",
     "descricao": "Plano premium",
     "tipo": "Pago",
     "valor": 19.9
