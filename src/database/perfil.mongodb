@@ -197,11 +197,10 @@ db.createCollection("perfil", {
                conquistas: {
                     bsonType: "array",
                     uniqueItems: true,
-                    maxItems: 10,
                     additionalProperties: false,
                     items:{
                         bsonType: "object",
-                        required: ["id", "titulo"],
+                        required: ["id", "titulo", "descricao", "data_conquista"],
                         properties: {
                             id: {
                                 bsonType: "string",
@@ -213,6 +212,12 @@ db.createCollection("perfil", {
                                 minLength: 2,
                                 maxLength: 40,
                                 description: "Titulo da conquista deve ser um texto entre 2 a 40 caracteres e é obrigatório"
+                            },
+                            descricao: {
+                                bsonType: "string",
+                                minLength: 2,
+                                maxLength: 100,
+                                description: "Descrição da conquista deve ser um texto entre 2 a 100 caracteres e é obrigatório"
                             },
                             data_conquista: {
                                 bsonType: "date",
