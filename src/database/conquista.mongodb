@@ -1,0 +1,38 @@
+//Selecione o database
+use("mind")
+db.conquista.drop()
+db.createCollection("conquista", {
+    validator: {
+        $jsonSchema: {
+            bsonType: "object",
+            required: ["titulo", "descricao"],
+            properties: {
+                _id: { 
+                    bsonType: "objectId" 
+                },
+                titulo: {
+                    bsonType: "string",
+                    minLength: 2,
+                    maxLength: 40,
+                    description: "Titulo da conquista deve ser um texto entre 2 a 40 caracteres e é obrigatório"
+                },
+                descricao: {
+                    bsonType: "string",
+                    minLength: 2,
+                    maxLength: 100,
+                    description: "Descrição da conquista deve ser um texto entre 2 a 100 caracteres e é obrigatório"
+                }
+            },
+            additionalProperties: false
+        }
+    },
+    validationLevel: "moderate", //strict aplica no insert e no update, moderate no insert ou off
+    validationAction: "error" //error rejeita o documento ou warn inclui e registra no log
+})
+
+db.conquista.createIndex({ "titulo": 1 }, { unique: true })
+
+db.conquista.insertOne({
+    "titulo": "7 dias seguidos",
+    "descricao": "Entrou 7 dias seguidos"
+})
