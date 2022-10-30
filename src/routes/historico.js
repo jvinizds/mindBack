@@ -280,7 +280,7 @@ router.post('/', validaHistorico, async (req, res) => {
         }
     }
 
-    if (perfil[0].conteudo_recente.length == 20) {
+    if (perfil[0].conteudo_recente && perfil[0].conteudo_recente.length == 20) {
         try {
             await db.collection("perfil")
                 .updateOne({ '_id': { $eq: ObjectId(perfil_id) } },

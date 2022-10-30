@@ -322,7 +322,7 @@ router.post('/', validaConteudo, async (req, res) => {
                         } 
                     */
                     return res.status(500).json({
-                        error: "Conteudo com titulo ou key do arquivo já existente, no entanto houve um erro ao excluir do armazenamento o arquivo que subiu"
+                        error: "Erro ao subir documento no banco, no entanto houve um erro ao excluir do armazenamento o arquivo que subiu"
                     })
                 }
                 /*
