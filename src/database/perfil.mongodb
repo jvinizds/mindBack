@@ -49,22 +49,9 @@ db.createCollection("perfil", {
                     description: "Id do plano é obrigatorio"
                 },
                 telefone: {
-                    bsonType: "object",
-                    required: ["ddd", "numero"],
-                    properties: {
-                        ddd: {
-                            bsonType: "string",
-                            pattern: "^[0-9]{2}$",
-                            description: "DDD deve conter 2 números e é obrigatorio"
-                        },
-                        numero: {
-                            bsonType: "string",
-                            minLength: 8,
-                            maxLength: 9,
-                            pattern: "([0-9]{9}$)",
-                            description: "Número do celular deve conter 9 números e é obrigatorio"
-                        }
-                    }
+                    bsonType: "string",
+                    pattern: "([0-9]{10,11}$)",
+                    description: "Telefone deve conter 10 ou 11 números e é obrigatorio"
                 },
                 login: {
                     bsonType: "object",
@@ -273,10 +260,7 @@ db.perfil.insertOne({
     "nome": "João Vinicius",
     "sobrenome": "Santos",
     "tipo_perfil": "Usuario",
-    "telefone": {
-        "ddd": "11",
-        "numero": "975003307"
-    },
+    "telefone": "11975003307",
     "login": {
             "email": "joaoviniciuszds@gmail.com",
             "senha": "Jv159357!"

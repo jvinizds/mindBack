@@ -38,14 +38,10 @@ const validaPerfilCadastroAlterar = [
         .isAlpha('pt-BR', { ignore: ' ' }).withMessage('O sobrenome deve conter apenas texto')
         .isLength({ min: 3 }).withMessage('O sobrenome é muito curto. Informe ao menos 3 caracteres')
         .isLength({ max: 50 }).withMessage('O sobrenome é muito longo. Informe no máximo 50 caracteres'),
-    check('telefone.ddd')
-        .not().isEmpty().trim().withMessage('É obrigatório informar o DDD do telefone')
-        .isNumeric().withMessage('O DDD não pode conter caracteres especiais, apenas números')
-        .isLength({ min: 2, max: 2 }).withMessage('O tamanho do DDD informado é inválido'),
-    check('telefone.numero')
-        .not().isEmpty().trim().withMessage('É obrigatório informar o número do telefone')
-        .isNumeric().withMessage('O número não pode conter caracteres especiais, apenas números')
-        .isLength({ min: 9, max: 9 }).withMessage('O tamanho do número informado é inválido'),
+    check('telefone')
+        .not().isEmpty().trim().withMessage('É obrigatório informar o telefone')
+        .isNumeric().withMessage('O telefone não pode conter caracteres especiais, apenas números')
+        .isLength({ min: 10, max: 11 }).withMessage('O tamanho do telefone informado é inválido. Deve ter entre 10 e 11 números'),
     check('login.email')
         .not().isEmpty().trim().withMessage('É obrigatório informar o email do usuário')
         .isLowercase().withMessage('O email não pode conter caracteres maiúsculos')
