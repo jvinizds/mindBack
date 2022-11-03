@@ -513,7 +513,7 @@ router.post('/login', validaPerfilLogin, async (req, res) => {
                 //setTokenCookie(res, token)
                 res.status(200).json({
                     access_token: token,
-                    perfil_id: perfil[0]._id
+                    perfil_id: usuario[0]._id
                 })
             }
         )
