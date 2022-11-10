@@ -74,9 +74,9 @@ const validaTipoPerfilProgresso = [
         .default('Usuario'),
     check('progresso.ansiedade')
         .default(0),
-    check('progresso.foco')
-        .default(0),
     check('progresso.ioga')
+        .default(0),
+    check('progresso.meditacao')
         .default(0),
 ]
 
