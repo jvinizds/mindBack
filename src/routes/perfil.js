@@ -72,11 +72,11 @@ const validaPerfilCadastroAlterar = [
 const validaTipoPerfilProgresso = [
     check('tipo_perfil')
         .default('Usuario'),
-    check('progresso.artigo')
+    check('progresso.ansiedade')
         .default(0),
-    check('progresso.audio')
+    check('progresso.foco')
         .default(0),
-    check('progresso.video')
+    check('progresso.ioga')
         .default(0),
 ]
 

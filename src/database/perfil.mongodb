@@ -167,17 +167,17 @@ db.createCollection("perfil", {
                 progresso: {
                     bsonType: "object",
                     properties: {
-                        artigo: {
+                        ansiedade: {
                             bsonType: "number",
-                            description: "Quantidade de artigos já vistos pelo usuario"
+                            description: "Quantidade de conteudos de ansiedade já vistos pelo usuario"
                         },
-                        audio: {
+                        ioga: {
                             bsonType: "number",
-                            description: "Quantidade de audios já vistos pelo usuario"
+                            description: "Quantidade de conteudos de ioga já vistos pelo usuario"
                         },
-                        video: {
+                        meditacao: {
                             bsonType: "number",
-                            description: "Quantidade de videos já vistos pelo usuario"
+                            description: "Quantidade de conteudos de meditacao já vistos pelo usuario"
                         }                     
                     }
                 },

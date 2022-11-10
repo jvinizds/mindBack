@@ -278,17 +278,17 @@ router.post('/', validaHistorico, async (req, res) => {
 
     const historico = { perfil_id: perfil_id, conteudo_id: conteudo_id, data_historico: data_historico }
 
-    const progresso = { artigo: perfil[0].progresso.artigo, audio: perfil[0].progresso.audio, video: perfil[0].progresso.video }
+    const progresso = { ansiedade: perfil[0].progresso.ansiedade, ioga: perfil[0].progresso.ioga, meditacao: perfil[0].progresso.meditacao }
 
-    switch (conteudo[0].tipo) {
-        case "Artigo":
-            progresso.artigo++
+    switch (conteudo[0].categoria) {
+        case "Ansiedade":
+            progresso.ansiedade++
             break;
-        case "Audio":
-            progresso.audio++
+        case "Ioga":
+            progresso.ioga++
             break;
-        case "Video":
-            progresso.video++
+        case "Meditação":
+            progresso.meditacao++
             break;
     }
 
