@@ -16,6 +16,23 @@ const validaConquista = [
         .isLength({ min: 2, max: 100 }).withMessage('O tamanho da descrição informada é inválida, deve ser entre 2 e 100 caracteres')
 ]
 
+const validaConquistaPerfil = [
+    check('perfil_id')
+        .not().isEmpty().trim().withMessage('É obrigatório informar o id do perfil')
+        .custom(async (value, { req }) => {
+            if (!ObjectId.isValid(value)) {
+                return Promise.reject('O id do perfil informado está incorreto')
+            }
+        }),
+    check('conquista_id')
+        .not().isEmpty().trim().withMessage('É obrigatório informar o id da conquista')
+        .custom(async (value, { req }) => {
+            if (!ObjectId.isValid(value)) {
+                return Promise.reject('O id da conquista informado está incorreto')
+            }
+        })
+]
+
 //GET conquista/
 router.get("/", async (req, res) => {
     /*
@@ -133,6 +150,90 @@ router.post('/', validaConquista, async (req, res) => {
     await db.collection(nomeCollection)
         .insertOne(req.body)
         // #swagger.responses[201] = { description: 'Conquista registrada com sucesso' }
+        .then(result => res.status(201).send(result))
+        // #swagger.responses[400] = { description: 'Bad Request' }     
+        .catch(err => res.status(400).json({ error: error_handler(err.code) }))
+})
+
+// POST conquista/perfil
+router.post('/perfil/', validaConquistaPerfil, async (req, res) => {
+    /*  
+        #swagger.tags = ['Conquista']
+        #swagger.description = 'Endpoint para cadastrar uma nova conquista no perfil do usuario' 
+    */
+    /*
+        #swagger.parameters['Conquista'] = {
+            in: 'body',
+            description: 'Informações da conquista.',
+            required: true,
+            type: 'object',
+            schema: { $ref: "#/definitions/Conquista" }
+        } 
+    */
+    const schemaErrors = validationResult(req)
+    if (!schemaErrors.isEmpty()) {
+        /*
+            #swagger.responses[403] = { 
+                schema: { "$ref": "#/definitions/Erro" },
+                description: "Validação dos parametros enviados falhou" 
+            } 
+        */
+        return res.status(403).json({
+            error: schemaErrors.array()[0].msg
+        })
+    }
+
+    const perfil_id = req.body.perfil_id
+    const conquista_id = req.body.conquista_id
+    const data_conquista = new Date(Date.now())
+
+    const perfil = await db.collection('perfil').find({ "_id": { $eq: ObjectId(perfil_id) } }).toArray()
+    if (!perfil.length) {
+        /*
+            #swagger.responses[404] = { 
+                schema: { "$ref": "#/definitions/Erro" },
+                description: "O perfil informado não existe" 
+            } 
+        */
+        return res.status(404).json({
+            error: "O perfil informado não existe"
+        })
+    }
+
+    const conquistaConsultada = await db.collection('conquista').find({ "_id": { $eq: ObjectId(conquista_id) } }).toArray()
+    if (!conquistaConsultada.length) {
+        /*
+            #swagger.responses[404] = { 
+                schema: { "$ref": "#/definitions/Erro" },
+                description: "A conquista informada não existe" 
+            } 
+        */
+        return res.status(404).json({
+            error: "A conquista informada não existe"
+        })
+    }
+
+    if (perfil[0].conquistas && perfil[0].conquistas.some(conquista => conquista.id == conquista_id)) {
+        /* 
+            #swagger.responses[500] = { 
+                schema: { "$ref": "#/definitions/Erro" },
+                description: "Conquista já existente nesse perfil" 
+            } 
+        */
+        return res.status(500).json({
+            error: "Conquista já existente nesse perfil"
+        })
+    }
+
+    const conquista = { id: conquista_id, titulo: conquistaConsultada[0].titulo, descricao: conquistaConsultada[0].descricao, data_conquista: data_conquista }
+
+    await db.collection('perfil')
+        .updateOne({ '_id': { $eq: ObjectId(perfil_id) } },
+            {
+                $push: { conquistas: conquista }
+            }
+        )
+        // #swagger.responses[201] = { description: 'Conquista registrada para o perfil com sucesso' }
         .then(result => res.status(201).send(result))
         // #swagger.responses[400] = { description: 'Bad Request' }     
         .catch(err => res.status(400).json({ error: error_handler(err.code) }))
