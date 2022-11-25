@@ -412,8 +412,7 @@ router.put('/:id', validaConteudo, async (req, res) => {
                 error: "Arquivo não enviado no request"
             })
         }
-
-        const schemaErrors = validationResult(req)
+        const schemaErrors = validationResult(req.body)
         if (!schemaErrors.isEmpty()) {
             try {
                 arquivoDelete(arquivo.key)
