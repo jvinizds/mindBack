@@ -63,7 +63,8 @@ const multerConfig = (pasta) => {
                     "text/plain"
                 ],
                 audios: [
-                    "audio/mpeg"
+                    "audio/mpeg",
+                    "video/mp4"
                 ],
                 imagens_perfil: [
                     "image/jpeg",
