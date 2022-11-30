@@ -172,7 +172,7 @@ router.get("/id/:id", async (req, res) => {
         return res.status(403).json({
             error: "ID enviado está incorreto"
         })
-    } 
+    }
 
     try {
         db.collection(nomeCollection).find({ "_id": { $eq: ObjectId(req.params.id) } }, {
@@ -241,7 +241,7 @@ router.post('/', validaPerfilCadastroAlterar, validaTipoPerfilProgresso, validaP
 })
 
 // PUT perfil/:id
-router.put('/:id', validaPerfilCadastroAlterar, validaPlano, async (req, res) => {
+router.put('/:id', validaPerfilCadastroAlterar, async (req, res) => {
     /*  
         #swagger.tags = ['Perfil']
         #swagger.description = 'Endpoint para alterar informações do perfil' 
@@ -278,16 +278,31 @@ router.put('/:id', validaPerfilCadastroAlterar, validaPlano, async (req, res) =>
         return res.status(403).json({
             error: schemaErrors.array()[0].msg
         })
-    } else {
-        await db.collection(nomeCollection)
-            .updateOne({ '_id': { $eq: ObjectId(req.params.id) } },
-                { $set: req.body }
-            )
-            // #swagger.responses[201] = { description: 'Perfil alterado com sucesso' }
-            .then(result => res.status(201).send(result))
-            // #swagger.responses[400] = { description: 'Bad Request' }     
-            .catch(err => res.status(400).json({ error: err }))
     }
+
+    let perfil = await db.collection(nomeCollection).find({ "cpf": req.body.cpf }).limit(1).toArray()
+    if (!perfil.length)
+        return res.status(404).json({
+            error: "Não foi localizado nenhum perfil com esse cpf"
+        })
+
+    const isMatch = await bcrypt.compare(req.body.login.senha, perfil[0].login.senha)
+    if (!isMatch)
+        return res.status(403).json({
+            error: 'A senha informada está incorreta'
+        })
+
+    req.body.login.senha = perfil[0].login.senha
+
+    await db.collection(nomeCollection)
+        .updateOne({ '_id': { $eq: ObjectId(req.params.id) } },
+            { $set: req.body }
+        )
+        // #swagger.responses[201] = { description: 'Perfil alterado com sucesso' }
+        .then(result => res.status(201).send(result))
+        // #swagger.responses[400] = { description: 'Bad Request' }     
+        .catch(err => res.status(400).json({ error: err }))
+
 })
 
 // PUT perfil/imagem/:id
